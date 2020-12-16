@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@ecomplus/application-sdk": "^22.0.0-firestore.1.14.0",
-    "@google-cloud/firestore": "^4.8.0",
+    "@google-cloud/firestore": "^4.8.1",
     "express": "^4.17.1",
-    "firebase-admin": "^9.4.1",
+    "firebase-admin": "^9.4.2",
     "firebase-functions": "^3.13.0",
     "form-data": "^3.0.0"
   },
