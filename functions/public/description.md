@@ -24,19 +24,19 @@ Com apoio do **Tiny Erp** melhoramos a integração deixando ela mais robusta pa
 
 Realize o login em seu painel administrativo em https://app.e-com.plus. Você será direcionado para a página inicial:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/instalar.png)
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/instalar.png)
 
 Na imagem acima, está destacado duas ações a primeira é salvar o **Store ID** da sua loja para configuração posterior no **Tiny**, no caso é **1011** e clicar no ícone conforme a figura abaixo:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/aplicativo.png)
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/aplicativo.png)
 
 Desça até o aplicativo da **Tiny ERP**, conforme pode ser visualizado:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/app_tiny.png)
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/app_tiny.png)
 
 Confirme e depois em clique em **Instalar**:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/app_tiny2.png)
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/app_tiny2.png)
 
 Após alguns segundos o seu app será instalado!
 
@@ -52,7 +52,7 @@ Em seguida, você será redirecionado para a página **Inicial** do painel no **
 
 Clique em **Extensões do Tiny**, conforme imagem:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/extensoes.png)
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/extensoes.png)
  
 
 Certifique-se que está instalado:
@@ -62,7 +62,7 @@ Certifique-se que está instalado:
 
 Conforme imagem:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/confirmacao.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/confirmacao.png) 
 
 Segundo passo é a criação da sua loja dentro do painel do Tiny para realizar demais configurações.
 
@@ -70,27 +70,27 @@ Segundo passo é a criação da sua loja dentro do painel do Tiny para realizar 
 
 Acesse o menu lateral e clique em Configurações:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/configuracao.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/configuracao.png) 
 
 Depois em **e-commerce** > **Integrações**:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/integracao.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/integracao.png) 
 
 Clique em **Incluir integração**:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/integracao2.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/integracao2.png) 
 
 Escolha **E-Com Plus** e clique em **Salvar**, conforme:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/salvar.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/salvar.png) 
 
 Feito isso, clique na **Integração criada**, de acordo com a imagem:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/criada.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/criada.png) 
 
 Clique em **Ver credenciais de acesso**
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/credenciais_acesso.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/credenciais_acesso.png) 
 
 Abrirá uma modal com duas informações:
 
@@ -99,7 +99,7 @@ Abrirá uma modal com duas informações:
 
 Que deverão **ser copiadas e salvas em um bloco de notas**, pois elas serão importantíssimas para ativação da integração no painel administrativo da **E-Com Plus**
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/credencial.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/credencial.png) 
 
 Feche a janela e clique na aba **Notificações**. Aparecerá alguns campos para serem preenchidos:
 
@@ -123,16 +123,16 @@ Acesse o aplicativo instalado pelo [link](https://app.e-com.plus/#/apps/edit/105
 
 Clique na aba **Configuração**, conforme imagem abaixo:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/config_ecom.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/config_ecom.png) 
 
 Você lembra que salvou  **Identificador do integrador** e **Token**? Então, precisará deles aqui, primeiramente cole o token no espaço indicado na aba Geral, conforme imagem abaixo:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/chave.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/chave.png) 
 
 
 Desça até a aba **Configuração de novos pedidos**:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/novo_pedido.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/novo_pedido.png) 
 
 
 Insira o **Identificador do integrador**, conforme na imagem acima e clique em **Salvar**.
@@ -154,14 +154,14 @@ Na aba **Geral**, temos as seguintes opções:
 
 Na aba **Exportação manual**, pode ser enviado **produtos e pedidos manualmente** pelos seus respectivos IDs, conforme imagem:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/exportar_manual.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/exportar_manual.png) 
 
 
 Na aba **Importação manual**, pode ser importado do Tiny **produtos** para serem criados na plataforma e **pedidos** para atualizar situação dos mesmos, de forma manual.
 
 Para importar produtos, basta inserir o **Código(SKU)** configurado no Tiny e para pedido é o **número do pedido da plataforma**, conforme imagem:
 
-![exemplo](https://us-central1-ecom-bling.cloudfunctions.net/app/img/importar_manual.png) 
+![exemplo](https://us-central1-ecom-mandabem.cloudfunctions.net/app/img/importar_manual.png) 
 
 
 Em **Configuração para novos pedidos no Tiny**:
