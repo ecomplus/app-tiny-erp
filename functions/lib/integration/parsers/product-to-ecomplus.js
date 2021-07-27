@@ -81,7 +81,7 @@ module.exports = (tinyProduct, storeId, auth, isNew = true) => new Promise((reso
     cost_price: tinyProduct.preco_custo,
     price: tinyProduct.preco_promocional || tinyProduct.preco,
     base_price: tinyProduct.preco,
-    warranty: tinyProduct.garantia,
+    warranty: tinyProduct.garantia || '',
     body_html: tinyProduct.descricao_complementar
   }
 
