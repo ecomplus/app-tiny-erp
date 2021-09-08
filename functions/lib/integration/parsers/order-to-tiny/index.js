@@ -177,6 +177,9 @@ module.exports = (order, appData, storeId) => {
   if (order.notes) {
     tinyOrder.obs = order.notes.substring(0, 100)
   }
+  if (order.extra_discount && order.extra_discount.discount_coupon) {
+    tinyOrder.obs += ' - ' + order.extra_discount.discount_coupon.substring(0, 100)
+  }
   if (order.staff_notes) {
     tinyOrder.obs_internas = order.staff_notes.substring(0, 100)
   }
