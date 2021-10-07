@@ -24,7 +24,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
         const situacao = typeof pedido.situacao === 'string'
           ? pedido.situacao.toLowerCase()
           : null
-        console.log(`#${storeId} import order ${pedido.numero_ecommerce}, ${pedido.id} e situacao: ${situacao}`)
+        console.log(`#${storeId} import order ${pedido.numero_ecommerce}, ${pedido.id} e status: ${situacao}`)
         const documentRef = firestore().doc(`tiny_orders/${storeId}_${tinyOrderId}`)
         return documentRef.get().then(documentSnapshot => {
           if (
@@ -101,12 +101,12 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
   if (typeof tinyOrderNumber === 'string' && tinyOrderNumber.startsWith('id:')) {
     job = getTinyOrder(tinyOrderNumber.substring(3))
   } else {
-    console.log(`Order ${tinyOrderNumber} do not have id`)
+    console.log(`#${storeId} Order ${tinyOrderNumber} do not have id`)
     job = tiny.post('/pedidos.pesquisa.php', { numero: tinyOrderNumber })
       .then(({ pedidos }) => {
         const tinyOrder = pedidos.find(({ pedido }) => Number(tinyOrderNumber) === Number(pedido.numero))
         if (tinyOrder) {
-          console.log(`Order without ID - ${tinyOrder}`)
+          console.log(`#${storeId} Order without ID - ${tinyOrder}`)
           return getTinyOrder(tinyOrder.pedido.id)
         } else {
           return null
