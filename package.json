@@ -43,7 +43,7 @@
     "@commitlint/cli": "^13.2.0",
     "@commitlint/config-conventional": "^13.2.0",
     "husky": "^4.3.8",
-    "standard": "^16.0.3",
+    "standard": "^16.0.4",
     "standard-version": "^9.3.1"
   },
   "husky": {
