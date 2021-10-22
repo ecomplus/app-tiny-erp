@@ -185,6 +185,7 @@ exports.post = ({ appSdk, admin }, req, res) => {
                         order_ids: [resourceId]
                       }
                     }
+                    console.log(`> Webhook #${storeId} ${JSON.stringify(integrationConfig)`)
                   }
                   break
               }
@@ -219,6 +220,7 @@ exports.post = ({ appSdk, admin }, req, res) => {
                           const timestamp = Date.now()
                           const documentSnapshot = validateDocSnapshot()
                           if (!documentSnapshot || timestamp - documentSnapshot.get(key) < 20000) {
+                            console.log(`#${storeId}` + timestamp + ` ${JSON.stringify(integrationConfig)}`)
                             break
                           }
                           const debugFlag = `#${storeId} ${action}/${queue}/${nextId}`
@@ -243,7 +245,7 @@ exports.post = ({ appSdk, admin }, req, res) => {
               }
             }
 
-            // console.log('> Skip webhook:', JSON.stringify(appData))
+            console.log('> Skip webhook:', JSON.stringify(appData))
             uncountRequest()
             // nothing to do
             return {}
