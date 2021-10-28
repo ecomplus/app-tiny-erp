@@ -26,6 +26,8 @@ module.exports = order => {
       return 'enviado'
     case 'delivered':
       return 'entregue'
+    case 'returned'
+      return 'cancelado'
   }
 
   if (financialStatus && financialStatus.endsWith('paid')) {
