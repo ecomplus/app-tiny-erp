@@ -180,7 +180,10 @@ module.exports = (tinyProduct, storeId, auth, isNew = true) => new Promise((reso
         if (imagemExterna.imagem_externa) {
           const { url } = imagemExterna.imagem_externa
           if (url) {
-            product.pictures.push({ normal: { url } })
+            product.pictures.push({ 
+              normal: { url },
+              _id: ecomUtils.randomObjectId()
+            })
           }
         }
       })
