@@ -31,7 +31,7 @@ module.exports = order => {
       return 'cancelado'
   }
 
-  if (financialStatus && financialStatus.current === 'paid') {
+  if (financialStatus && financialStatus === 'paid') {
     return 'aprovado'
   }
   return 'aberto'
