@@ -119,14 +119,8 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           const { product, variationId, hasVariations } = payload
           const tiny = new Tiny(tinyToken)
 
-          if (!product && isHiddenQueue) {
-            dispatchNullJob()
-            console.log(`#${storeId} skipping ${sku} / ${productId}`)
-            return
-          }
-
-          const handleTinyStock = ({ produto }, tinyProduct) => {
-            let quantity = Number(produto.saldo)
+          const handleTinyStock = ({ produto, tipo }, tinyProduct) => {
+            let quantity = Number(produto.saldo) || Number(produto.estoqueAtual)
             if (product && (!appData.update_product || variationId)) {
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
@@ -152,9 +146,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 if (productId) {
                   method = 'PATCH'
                   endpoint = `/products/${productId}.json`
-                } else {
+                } else if (!productId && (tipo !== 'estoque' || !tipo)) {
                   method = 'POST'
                   endpoint = '/products.json'
+                } else {
+                  return
                 }
                 return parseProduct(produto, storeId, auth, method === 'POST').then(product => {
                   if (!isNaN(quantity)) {
@@ -205,7 +201,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
 
           console.log(`#${storeId} ${JSON.stringify({ sku, productId, hasVariations, variationId })}`)
           let job
-          if (tinyStockUpdate && isHiddenQueue) {
+          if (tinyStockUpdate && isHiddenQueue && productId) {
             job = handleTinyStock(tinyStockUpdate)
           } else {
             job = tiny.post('/produtos.pesquisa.php', { pesquisa: sku })

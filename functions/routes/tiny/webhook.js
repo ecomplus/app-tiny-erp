@@ -76,6 +76,7 @@ exports.post = ({ appSdk, admin }, req, res) => {
                   const tinyStockUpdate = {
                     storeId,
                     ref: `${storeId}_${tinyToken}_${nextId}`,
+                    tipo,
                     produto: {
                       id: dados.idProduto,
                       codigo: dados.sku,
