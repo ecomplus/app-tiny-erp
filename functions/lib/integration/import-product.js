@@ -146,11 +146,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 if (productId) {
                   method = 'PATCH'
                   endpoint = `/products/${productId}.json`
-                } else if (!productId && (tipo !== 'estoque' || !tipo)) {
+                } else if (tipo === 'produto' || !tipo) {
                   method = 'POST'
                   endpoint = '/products.json'
                 } else {
-                  return
+                  return null
                 }
                 return parseProduct(produto, storeId, auth, method === 'POST').then(product => {
                   if (!isNaN(quantity)) {
