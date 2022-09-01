@@ -16,6 +16,21 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
       }
       const tiny = new Tiny(tinyToken)
       console.log(`#${storeId} ${orderId} searching order ${order.number}`)
+      const checkFulfillmentFromTiny = order => {
+        const fulfillmentStatus = order.fulfillment_status && order.fulfillment_status.current
+        if (fulfillmentStatus && order.fulfillments.length) {
+          return order.fulfillments.some(fulfillment => {
+            const flags = fulfillment && fulfillment.flags
+            return flags.includes('from-tiny')
+          })
+        }
+        return false
+      }
+      const hasUpdatedByTiny = checkFulfillmentFromTiny(order)
+      if (hasUpdatedByTiny) {
+        console.log(`#${storeId} ${orderId} skipped to not send status came by tiny`)
+        return null
+      }
 
       const job = tiny.post('/pedidos.pesquisa.php', { numeroEcommerce: String(order.number) })
         .catch(err => {
@@ -59,6 +74,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           } else {
             console.log(`#${storeId} ${orderId} found with tiny status ${tinyStatus}`)
           }
+
 
           if (tinyStatus) {
             return tiny.post('/pedido.alterar.situacao', {
