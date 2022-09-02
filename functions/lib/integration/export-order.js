@@ -2,6 +2,8 @@ const errorHandling = require('../store-api/error-handling')
 const Tiny = require('../tiny/constructor')
 const parseOrder = require('./parsers/order-to-tiny/')
 const parseStatus = require('./parsers/order-to-tiny/status')
+const formatDate = require('../../helpers/format-tiny-date')
+const selectTypeUpdate = require('../../helpers/select-type-update')
 const handleJob = require('./handle-job')
 
 module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, canCreateNew) => {
@@ -16,18 +18,39 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
       }
       const tiny = new Tiny(tinyToken)
       console.log(`#${storeId} ${orderId} searching order ${order.number}`)
-      const checkFulfillmentFromTiny = order => {
-        const fulfillmentStatus = order.fulfillment_status && order.fulfillment_status.current
-        if (fulfillmentStatus && Array.isArray(order.fulfillments)) {
-          return Boolean(order.fulfillments.find(({ status, flags }) => {
-            return status === fulfillmentStatus && flags && flags.includes('from-tiny')
-          }))
+      const findLatestUpdate = order => {
+        const fulfillments = order.fulfillments
+        const paymentsHistory = order.payments_history
+        let latestFulfillment, latestPayment
+        if (Array.isArray(fulfillments)) {
+          latestFulfillment = fulfillments.reduce((a, b) => (a.date_time > b.date_time ? a : b))
         }
-        return false
+        if (Array.isArray(paymentsHistory)) {
+          latestPayment = paymentsHistory.reduce((a, b) => (a.date_time > b.date_time ? a : b))
+        }
+        if (latestFulfillment && latestPayment) {
+          return latestFulfillment.date_time > latestPayment.date_time ? latestFulfillment : latestPayment
+        } else if (latestFulfillment && !latestPayment) {
+          return latestFulfillment
+        } else if (!latestFulfillment && latestPayment) {
+          return latestPayment
+        }
       }
-      if (checkFulfillmentFromTiny(order)) {
-        console.log(`#${storeId} ${orderId} skipped to not send status came by tiny`)
-        return null
+      const latestUpdateStatus = findLatestUpdate(order)
+      if (selectTypeUpdate(latestStatusUpdate) === 'fulfillment') {
+        const checkFulfillmentFromTiny = order => {
+          const fulfillmentStatus = order.fulfillment_status && order.fulfillment_status.current
+          if (fulfillmentStatus && Array.isArray(order.fulfillments)) {
+            return Boolean(order.fulfillments.find(({ status, flags }) => {
+              return status === fulfillmentStatus && flags && flags.includes('from-tiny')
+            }))
+          }
+          return false
+        }
+        if (checkFulfillmentFromTiny(order)) {
+          console.log(`#${storeId} ${orderId} skipped to not send status came by tiny`)
+          return null
+        }
       }
 
       const job = tiny.post('/pedidos.pesquisa.php', { numeroEcommerce: String(order.number) })
