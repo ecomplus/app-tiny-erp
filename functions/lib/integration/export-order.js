@@ -19,11 +19,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
       const checkFulfillmentFromTiny = order => {
         const fulfillmentStatus = order.fulfillment_status && order.fulfillment_status.current
         if (fulfillmentStatus && Array.isArray(order.fulfillments)) {
-          const fulfillment = order.fulfillments.find(fulfillment => fulfillment.status === fulfillmentStatus)
-          if (fulfillment) {
-            const flags = fulfillment && fulfillment.flags
-            return flags.includes('from-tiny')
-          }
+          return Boolean(order.fulfillments.find(({ status, flags }) => {
+            return status === fulfillmentStatus && flags && flags.includes('from-tiny')
+          }))
         }
         return false
       }
