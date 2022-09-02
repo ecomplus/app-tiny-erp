@@ -27,8 +27,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
         }
         return false
       }
-      const hasUpdatedByTiny = checkFulfillmentFromTiny(order)
-      if (hasUpdatedByTiny) {
+      if (checkFulfillmentFromTiny(order)) {
         console.log(`#${storeId} ${orderId} skipped to not send status came by tiny`)
         return null
       }
