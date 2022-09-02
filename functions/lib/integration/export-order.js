@@ -2,7 +2,6 @@ const errorHandling = require('../store-api/error-handling')
 const Tiny = require('../tiny/constructor')
 const parseOrder = require('./parsers/order-to-tiny/')
 const parseStatus = require('./parsers/order-to-tiny/status')
-const formatDate = require('../../helpers/format-tiny-date')
 const selectTypeUpdate = require('../../helpers/select-type-update')
 const handleJob = require('./handle-job')
 
