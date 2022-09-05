@@ -36,7 +36,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
         }
       }
       const latestUpdateStatus = findLatestUpdate(order) || {}
-      if (selectTypeUpdate(latestStatusUpdate) === 'fulfillment') {
+      if (selectTypeUpdate(latestUpdateStatus) === 'fulfillment') {
         const checkFulfillmentFromTiny = order => {
           const fulfillmentStatus = order.fulfillment_status && order.fulfillment_status.current
           if (fulfillmentStatus && Array.isArray(order.fulfillments)) {
