@@ -7,7 +7,7 @@ module.exports = (order, appData, storeId) => {
 
   const tinyOrder = {
     numero_pedido_ecommerce: orderRef,
-    data_pedido: formatDate(new Date(order.opened_at || order.created_at)),
+    data_pedido: formatDate(new Date(order.created_at || order.opened_at)),
     ecommerce: 'E-Com Plus',
     situacao: parseStatus(order),
     itens: []
