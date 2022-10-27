@@ -1,7 +1,6 @@
 const ecomUtils = require('@ecomplus/utils')
 const parseStatus = require('./status')
 const formatDate = require('../../helpers/format-tiny-date')
-const normalizeString = require('../../helpers/normalize-string')
 
 module.exports = (order, appData, storeId) => {
   const orderRef = String(order.number) || order._id
@@ -39,12 +38,12 @@ module.exports = (order, appData, storeId) => {
   if (buyer) {
     const tinyCustomer = {
       codigo: buyer._id,
-      nome: normalizeString((buyer.corporate_name || ecomUtils.fullName(buyer)).substring(0, 30)) ||
+      nome: (buyer.corporate_name || ecomUtils.fullName(buyer).substring(0, 30))?.replace('&', 'e') ||
         `Comprador de #${orderRef}`,
       tipo_pessoa: buyer.registry_type === 'j' ? 'J' : 'F'
     }
     if (buyer.display_name) {
-      tinyCustomer.nome_fantasia = buyer.display_name.substring(0, 30)
+      tinyCustomer.nome_fantasia = buyer.display_name.substring(0, 30).replace('&', 'e')
     }
     if (buyer.doc_number && buyer.doc_number.length <= 18) {
       tinyCustomer.cpf_cnpj = buyer.doc_number
