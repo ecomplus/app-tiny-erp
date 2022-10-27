@@ -1,13 +1,7 @@
 const ecomUtils = require('@ecomplus/utils')
 const axios = require('axios')
 const FormData = require('form-data')
-
-const removeAccents = str => str.replace(/áàãâÁÀÃÂ/g, 'a')
-  .replace(/éêÉÊ/g, 'e')
-  .replace(/óõôÓÕÔ/g, 'o')
-  .replace(/íÍ/g, 'e')
-  .replace(/úÚ/g, 'u')
-  .replace(/çÇ/g, 'c')
+const normalizeString = require('../helpers/normalize-string')
 
 const tryImageUpload = (storeId, auth, originImgUrl, product) => new Promise(resolve => {
   axios.get(originImgUrl, {
@@ -85,7 +79,7 @@ module.exports = (tinyProduct, storeId, auth, isNew = true) => new Promise((reso
   }
 
   if (isNew) {
-    product.slug = removeAccents(name.toLowerCase())
+    product.slug = normalizeString(name.toLowerCase())
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-_./]/g, '')
     if (!/[a-z0-9]/.test(product.slug.charAt(0))) {
