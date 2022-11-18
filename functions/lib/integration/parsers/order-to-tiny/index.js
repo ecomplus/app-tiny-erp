@@ -38,7 +38,7 @@ module.exports = (order, appData, storeId) => {
   if (buyer) {
     const tinyCustomer = {
       codigo: buyer._id,
-      nome: (buyer.corporate_name || ecomUtils.fullName(buyer).substring(0, 30))?.replace('&', 'e') ||
+      nome: (buyer.corporate_name || ecomUtils.fullName(buyer))?.substring(0, 30).replace('&', 'e') ||
         `Comprador de #${orderRef}`,
       tipo_pessoa: buyer.registry_type === 'j' ? 'J' : 'F'
     }
