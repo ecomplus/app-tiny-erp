@@ -36,18 +36,18 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
     .then(tinyStockUpdate => {
       const findingProduct = productId
         ? ecomClient.store({
-            storeId,
-            url: `/products/${productId}.json`
+          storeId,
+          url: `/products/${productId}.json`
+        })
+          .then(({ data }) => data)
+          .catch(err => {
+            if (err.response && err.response.status >= 400 && err.response.status < 500) {
+              console.log(`#${storeId} ${productId} => ${err.response.status}`)
+              return null
+            }
+            console.error(err)
+            throw err
           })
-            .then(({ data }) => data)
-            .catch(err => {
-              if (err.response && err.response.status >= 400 && err.response.status < 500) {
-                console.log(`#${storeId} ${productId} => ${err.response.status}`)
-                return null
-              }
-              console.error(err)
-              throw err
-            })
 
         : ecomClient.search({
           storeId,
@@ -187,11 +187,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                           })
                           return isQueuedVariations
                             ? updateAppData({ appSdk, storeId, auth }, {
-                                __importation: {
-                                  ...appData.__importation,
-                                  skus
-                                }
-                              })
+                              __importation: {
+                                ...appData.__importation,
+                                skus
+                              }
+                            })
                             : true
                         })
                     }).catch(console.error)
