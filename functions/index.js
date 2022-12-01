@@ -5,6 +5,8 @@ const { functionName, operatorToken, baseUri } = require('./__env')
 const path = require('path')
 const recursiveReadDir = require('./lib/recursive-read-dir')
 
+const handleEventTiny = require('./lib/pubsub/webhook-tiny')
+
 // Firebase SDKs to setup cloud functions and access Firestore database
 const admin = require('firebase-admin')
 const functions = require('firebase-functions')
@@ -162,3 +164,6 @@ const clearTinyStates = require('./lib/integration/clear-tiny-states')
 const clearStatesCron = '10 17 * * *'
 exports.scheduledClear = functions.pubsub.schedule(clearStatesCron).onRun(clearTinyStates)
 console.log(`-- Sheduled clearing Tiny stored states '${clearStatesCron}'`)
+
+exports.onTinyEvents = require('./lib/pubsub/create-topic')
+  .createEventsFunction('tiny', handleEventTiny)
