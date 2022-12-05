@@ -46,15 +46,6 @@ module.exports = async (
             return new Promise((resolve, reject) => {
               console.log(`> Tiny webhook: #${storeId} order ${orderNumber}`)
 
-              const launchRetry = (err) => {
-                if (err) {
-                  console.error(err)
-                  return reject(err)
-                }
-
-                return reject(new Error(`Unexpected error=> ${context.eventId}`))
-              }
-
               const queueEntry = {
                 nextId: orderNumber,
                 isNotQueued: true,
@@ -62,11 +53,10 @@ module.exports = async (
                   if (!err && isDone) {
                     return resolve(true)
                   }
-                  launchRetry(err)
+                  throw err
                 }
               }
               importOrder(appClient, tinyToken, queueEntry, appData, false, true)
-                .catch(launchRetry)
             })
           }
         }
@@ -88,15 +78,6 @@ module.exports = async (
               }
               console.log(`> Tiny webhook: #${storeId} ${nextId} => ${tinyStockUpdate.produto.saldo}`)
 
-              const launchRetry = (err) => {
-                if (err) {
-                  console.error(err)
-                  return reject(err)
-                }
-
-                return reject(new Error(`Unexpected error=> ${context.eventId}`))
-              }
-
               const queueEntry = {
                 nextId,
                 tinyStockUpdate,
@@ -105,11 +86,10 @@ module.exports = async (
                   if (!err && isDone) {
                     return resolve(true)
                   }
-                  launchRetry(err)
+                  throw err
                 }
               }
               importProduct(appClient, tinyToken, queueEntry, appData, false, true)
-                .catch(launchRetry)
             })
           }
         }
