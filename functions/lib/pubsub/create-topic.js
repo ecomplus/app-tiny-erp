@@ -1,5 +1,4 @@
 const functions = require('firebase-functions')
-
 const getPubSubTopic = (eventName) => {
   return `${eventName}_events`
 }
