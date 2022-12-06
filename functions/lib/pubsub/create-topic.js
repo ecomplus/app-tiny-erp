@@ -16,7 +16,7 @@ const createPubSubFunction = (
         console.warn(`Dropping event ${context.eventId} with age[ms]: ${eventAgeMs}`)
         return
       }
-      fn(message.json, context, message)
+      return fn(message.json, context, message)
     })
 }
 

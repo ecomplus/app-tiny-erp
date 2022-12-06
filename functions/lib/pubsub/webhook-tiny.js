@@ -99,4 +99,11 @@ module.exports = async (
         console.log('>> End Event ', context.eventId)
       })
   })
+    .catch((err) => {
+      if (err.appWithoutAuth) {
+        console.error(err)
+      } else {
+        throw err
+      }
+    })
 }
