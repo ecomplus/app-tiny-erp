@@ -104,7 +104,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
     job = getTinyOrder(tinyOrderNumber.substring(3))
   } else {
     const filter = typeof tinyOrderNumber === 'string' && tinyOrderNumber.startsWith('ecom:')
-      ? { numeroEcommerce: String(tinyOrderNumber) }
+      ? { numeroEcommerce: String(tinyOrderNumber).substring(5) }
       : { numero: tinyOrderNumber }
     job = tiny.post('/pedidos.pesquisa.php', filter)
       .then(({ pedidos }) => {
