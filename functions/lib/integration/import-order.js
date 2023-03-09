@@ -103,7 +103,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
   if (typeof tinyOrderNumber === 'string' && tinyOrderNumber.startsWith('id:')) {
     job = getTinyOrder(tinyOrderNumber.substring(3))
   } else {
-    job = tiny.post('/pedidos.pesquisa.php', { numero: tinyOrderNumber })
+    job = tiny.post('/pedidos.pesquisa.php', { numeroEcommerce: String(tinyOrderNumber) })
       .then(({ pedidos }) => {
         const tinyOrder = pedidos.find(({ pedido }) => Number(tinyOrderNumber) === Number(pedido.numero))
         if (tinyOrder) {
