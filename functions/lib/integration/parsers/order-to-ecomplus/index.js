@@ -30,12 +30,16 @@ module.exports = (tinyOrder, shippingLines, tiny) => new Promise((resolve, rejec
       return tiny.post('/nota.fiscal.obter.php', { id: tinyOrder.id_nota_fiscal })
         .then(tinyInvoice => {
           const number = String(tinyInvoice.nota_fiscal.numero)
-          if (number && !shippingLine.invoices.find(invoice => invoice.number === number)) {
+          const indexFromInvoice = shippingLine.invoices.findIndex(invoice => invoice.number === number)
+          if (number && !(indexFromInvoice > -1)) {
             shippingLine.invoices.push({
               number,
               serial_number: String(tinyInvoice.nota_fiscal.serie),
               access_key: String(tinyInvoice.nota_fiscal.chave_acesso)
             })
+          } else if (number && (indexFromInvoice > -1)) {
+            shippingLine.invoices[indexFromInvoice].access_key = String(tinyInvoice.nota_fiscal.chave_acesso)
+            shippingLine.invoices[indexFromInvoice].serial_number = String(tinyInvoice.nota_fiscal.serie)
           }
           partialOrder.shipping_lines = shippingLines
           resolve(partialOrder)
