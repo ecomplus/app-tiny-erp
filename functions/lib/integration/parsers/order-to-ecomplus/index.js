@@ -33,7 +33,8 @@ module.exports = (tinyOrder, shippingLines, tiny) => new Promise((resolve, rejec
           if (number && !shippingLine.invoices.find(invoice => invoice.number === number)) {
             shippingLine.invoices.push({
               number,
-              serial_number: String(tinyInvoice.nota_fiscal.serie)
+              serial_number: String(tinyInvoice.nota_fiscal.serie),
+              access_key: String(tinyInvoice.nota_fiscal.chave_acesso)
             })
           }
           partialOrder.shipping_lines = shippingLines
