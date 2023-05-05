@@ -108,7 +108,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
       : { numero: tinyOrderNumber }
     job = tiny.post('/pedidos.pesquisa.php', filter)
       .then(({ pedidos }) => {
-        const tinyOrder = pedidos.find(({ pedido }) => Number(tinyOrderNumber) === Number(pedido.numero))
+        let prop = 'numero'
+        if (filter && filter.numeroEcommerce) {
+          prop = 'numero_ecommerce'
+        }
+        const tinyOrder = pedidos.find(({ pedido }) => Number(tinyOrderNumber) === Number(pedido[prop]))
         if (tinyOrder) {
           return getTinyOrder(tinyOrder.pedido.id)
         } else {
