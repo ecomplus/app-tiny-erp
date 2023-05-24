@@ -9,7 +9,7 @@ module.exports = context => {
     return firestore()
       .collection(collName)
       .where(fieldName, '<', fieldVal)
-      .limit(1000)
+      .limit(2000)
       .get().then(async querySnapshot => {
         for (const doc of querySnapshot.docs) {
           // eslint-disable-next-line no-await-in-loop
