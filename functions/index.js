@@ -155,13 +155,13 @@ console.log(`-- Sheduled update E-Com Plus tokens '${cron}'`)
 
 // schedule sync from Tiny API to local Firestore and Store API
 const syncFromTiny = require('./lib/integration/sync-from-tiny')
-const syncCron = 'every 3 mins'
+const syncCron = 'every 4 mins'
 exports.scheduledSync = functions.pubsub.schedule(syncCron).onRun(syncFromTiny)
 console.log(`-- Sheduled active sync from Tiny API '${syncCron}'`)
 
 // delete old stored Tiny order states
 const clearTinyStates = require('./lib/integration/clear-tiny-states')
-const clearStatesCron = '08 09 * * *'
+const clearStatesCron = '34 07,19 * * *'
 exports.scheduledClear = functions.pubsub.schedule(clearStatesCron).onRun(clearTinyStates)
 console.log(`-- Sheduled clearing Tiny stored states '${clearStatesCron}'`)
 
