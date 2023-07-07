@@ -123,6 +123,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
             }
+            if (Number(storeId) === 51331) {
+              console.log('Estoque #51331', produto.codigo, quantity)
+            }
             if (product && (!appData.update_product || variationId)) {
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
