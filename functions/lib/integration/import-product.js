@@ -58,11 +58,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               bool: {
                 must: {
                   term: { skus: sku }
-                },
-                should: [
-                  { term: { visible: true } },
-                  { term: { available: true } }
-                ]
+                }
               }
             }
           }
@@ -120,6 +116,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           const tiny = new Tiny(tinyToken)
 
           const handleTinyStock = ({ produto, tipo }, tinyProduct) => {
+            if (Number(storeId) === 51331) {
+              console.log('Estoque #51331', JSON.stringify(produto))
+            }
             let quantity = Number(produto.saldo) || Number(produto.estoqueAtual)
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
