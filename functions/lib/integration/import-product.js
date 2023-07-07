@@ -28,7 +28,14 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           }
           documentSnapshot.ref.delete().catch(console.error)
         })
-        resolve(tinyStockUpdate)
+        if (
+          tinyStockUpdate.updatedAt &&
+          Date.now() - tinyStockUpdate.updatedAt.toDate().getTime() <= 1000 * 60 * 5
+        ) {
+          resolve(tinyStockUpdate)
+        } else {
+          resolve(null)
+        }
       })
       .catch(reject)
   })
