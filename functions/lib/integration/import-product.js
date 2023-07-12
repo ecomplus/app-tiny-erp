@@ -128,11 +128,17 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
 
           const handleTinyStock = ({ produto, tipo }, tinyProduct) => {
             if (Number(storeId) === 51331) {
-              console.log('Estoque #51331', produto.saldo, produto.estoqueAtual, produto.saldoReservado)
-            }
+              console.log('Estoque #51331', produto.saldo, produto.estoqueAtual)
+            }            
             let quantity = Number(produto.saldo) || Number(produto.estoqueAtual)
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
+              if (Number(storeId) === 51331) {
+                console.log('Estoque #51331 saldo reservado', produto.codigo, produto.saldoReservado)
+              } 
+            }
+            if (isNaN(quantity)) {
+              quantity = 0
             }
             if (Number(storeId) === 51331) {
               console.log('Estoque #51331', produto.codigo, quantity)
