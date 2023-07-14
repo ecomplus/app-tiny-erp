@@ -48,7 +48,7 @@ module.exports = (order, appData, storeId) => {
     if (buyer.doc_number && buyer.doc_number.length <= 18) {
       tinyCustomer.cpf_cnpj = buyer.doc_number
     }
-    if (buyer.inscription_number && buyer.inscription_number.length <= 18) {
+    if (buyer.inscription_number && buyer.inscription_number.length <= 18 && buyer.inscription_type === 'State') {
       tinyCustomer.ie = buyer.inscription_number
     }
     if (buyer.main_email && buyer.main_email.length <= 50) {
