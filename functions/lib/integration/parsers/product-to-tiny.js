@@ -51,12 +51,15 @@ module.exports = (product, originalTinyProduct, appData) => {
 
   if (product.weight && product.weight.value) {
     tinyProduct.peso_bruto = product.weight.value
+    tinyProduct.peso_liquido = product.weight.value
     switch (product.weight.unit) {
       case 'mg':
         tinyProduct.peso_bruto /= 1000000
+        tinyProduct.peso_liquido /= 1000000
         break
       case 'g':
         tinyProduct.peso_bruto /= 1000
+        tinyProduct.peso_liquido /= 1000
     }
   }
   if (product.dimensions) {
