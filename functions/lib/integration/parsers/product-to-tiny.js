@@ -1,6 +1,6 @@
 const ecomUtils = require('@ecomplus/utils')
 
-module.exports = (product, originalTinyProduct, appData) => {
+module.exports = (product, originalTinyProduct, appData, storeId) => {
   const hasVariations = product.variations && product.variations.length
 
   const tinyProduct = {
@@ -52,6 +52,9 @@ module.exports = (product, originalTinyProduct, appData) => {
   if (product.weight && product.weight.value) {
     tinyProduct.peso_bruto = product.weight.value
     tinyProduct.peso_liquido = product.weight.value
+    if (Number(storeId) === 4566) {
+      product.weight.unit = 'g'
+    }
     switch (product.weight.unit) {
       case 'mg':
         tinyProduct.peso_bruto /= 1000000

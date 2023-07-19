@@ -33,7 +33,7 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
               return null
             }
           }
-          const tinyProduct = parseProduct(product, originalTinyProduct, appData)
+          const tinyProduct = parseProduct(product, originalTinyProduct, appData, storeId)
           return tinyProduct
             ? tiny.post(originalTinyProduct ? '/produto.alterar.php' : '/produto.incluir.php', {
               produto: {
