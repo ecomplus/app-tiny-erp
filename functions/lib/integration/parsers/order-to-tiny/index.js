@@ -80,7 +80,7 @@ module.exports = (order, appData, storeId) => {
   if (order.items) {
     order.items.forEach(item => {
       if (item.quantity) {
-        const itemRef = (item.sku || item._id).substring(0, 30)
+        const itemRef = (item.sku || item._id).substring(0, 60)
         tinyOrder.itens.push({
           item: {
             codigo: itemRef,
