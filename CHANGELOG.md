@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.2.1](https://github.com/ecomplus/application-starter/compare/v3.2.0...v3.2.1) (2023-07-27)
+
+
+### Bug Fixes
+
+* check stores stock entries date up to 5min on product import ([316c4b3](https://github.com/ecomplus/application-starter/commit/316c4b3562cce741560bd8318aa34e35124d86e2))
+* **export-order:** double check order id before exporting ([40464ee](https://github.com/ecomplus/application-starter/commit/40464ee4be015c776f2fdef3a2442b4a0bb4e863))
+* **export-order:** send inscription number only when is state ([011b3ac](https://github.com/ecomplus/application-starter/commit/011b3ac8d37f8d410046ebc36fbc4e64c4db20a7))
+* **export-order:** send inscription number when (optional) type is undefined ([2031786](https://github.com/ecomplus/application-starter/commit/2031786d382806bbfa9672f14a29dbfee7e2c430))
+* **format-date:** set less 3 hours from zero utc server date ([6913d70](https://github.com/ecomplus/application-starter/commit/6913d7092f04a4d97ef25d833e2020b42b8330b3))
+* **import-order:** find order by correct prop when use ecom: ([a874071](https://github.com/ecomplus/application-starter/commit/a8740712fb53d59575887924521e86764a267459))
+* **product-to-ecomplus:** parse image from exactly order from tiny ([5591509](https://github.com/ecomplus/application-starter/commit/5591509f6054a2b1ef59c0ae9ec21617cea1df84))
+
 ## [3.2.0](https://github.com/ecomplus/application-starter/compare/v3.1.2...v3.2.0) (2023-03-10)
 
 
