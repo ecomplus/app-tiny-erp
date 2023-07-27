@@ -69,6 +69,19 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   return null
               }
             }
+            if (appData.ready_for_shipping_only) {
+              switch (tinyStatus) {
+                case 'aberto':
+                case 'cancelado':
+                case 'aprovado':
+                case 'preparando_envio':
+                case 'faturado':
+                  if (!order.fulfillment_status || order.fulfillment_status.current !== 'ready_for_shipping') {
+                    console.log(`#${storeId} ${orderId} skipped with status "${tinyStatus}"`)
+                    return null
+                  }
+              }
+            }
             const tinyOrder = parseOrder(order, appData, storeId)
             console.log(`#${storeId} ${orderId} ${JSON.stringify(tinyOrder)}`)
             return tiny.post('/pedido.incluir.php', {
@@ -79,7 +92,6 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           } else {
             console.log(`#${storeId} ${orderId} found with tiny status ${tinyStatus}`)
           }
-
 
           if (tinyStatus) {
             return tiny.post('/pedido.alterar.situacao', {

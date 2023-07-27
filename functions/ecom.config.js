@@ -161,7 +161,16 @@ const app = {
         type: 'boolean',
         default: false,
         title: 'Apenas pedidos aprovados',
-        description: 'Criar pedido no Bling após aprovação'
+        description: 'Criar pedido no Tiny após aprovação'
+      },
+      hide: true
+    },
+    ready_for_shipping_only: {
+      schema: {
+        type: 'boolean',
+        default: false,
+        title: 'Apenas pedidos prontos para envio',
+        description: 'Criar pedido no Tiny a partir do status "preparado para envio"'
       },
       hide: true
     },
