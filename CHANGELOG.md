@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://github.com/ecomplus/application-starter/compare/v3.2.1...v3.3.0) (2023-07-27)
+
+
+### Features
+
+* add option to automatically export orders on ready for shipping only ([27301f6](https://github.com/ecomplus/application-starter/commit/27301f65a6acbdd1c437bb841e6e59db15a01a8f))
+
 ### [3.2.1](https://github.com/ecomplus/application-starter/compare/v3.2.0...v3.2.1) (2023-07-27)
 
 
