@@ -68,7 +68,16 @@
         "type": "boolean",
         "default": false,
         "title": "Apenas pedidos aprovados",
-        "description": "Criar pedido no Bling após aprovação"
+        "description": "Criar pedido no Tiny após aprovação"
+      },
+      "hide": true
+    },
+    "ready_for_shipping_only": {
+      "schema": {
+        "type": "boolean",
+        "default": false,
+        "title": "Apenas pedidos prontos para envio",
+        "description": "Criar pedido no Tiny a partir do status \"preparado para envio\""
       },
       "hide": true
     },
@@ -260,5 +269,5 @@
     }
   },
   "auth_callback_uri": "https://appv2-gqnsyuqg6q-uc.a.run.app/ecom/auth-callback",
-  "version": "3.2.0"
+  "version": "3.3.0"
 }
