@@ -89,9 +89,21 @@ module.exports = (tinyProduct, storeId, auth, isNew = true) => new Promise((reso
   }
 
   if (isNew) {
-    if (tinyProduct.slug) {
-      product.slug = tinyProduct.slug
-    } else {
+    if (tinyProduct.seo) {
+      if (tinyProduct.seo.slug && tinyProduct.seo.slug.length) {
+        product.slug = tinyProduct.seo.slug
+      }
+      if (tinyProduct.seo.title && tinyProduct.seo.title.length) {
+        product.meta_title = tinyProduct.seo.title.slice(0, 254)
+      }
+      if (tinyProduct.seo.description && tinyProduct.seo.description.length) {
+        product.meta_description = tinyProduct.seo.description.slice(0, 999)
+      }
+      if (tinyProduct.seo.keywords && tinyProduct.seo.keywords.length) {
+        product.keywords = tinyProduct.seo.keywords.split(',')
+      }
+    }
+    if (!product.slug) {
       product.slug = removeAccents(name.toLowerCase())
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-_./]/g, '')
