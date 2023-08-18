@@ -28,9 +28,6 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           }
           documentSnapshot.ref.delete().catch(console.error)
         })
-        if (storeId == 51331) {
-          console.log(tinyStockUpdate) 
-        }
         resolve(tinyStockUpdate)
         /* if (
           tinyStockUpdate.updatedAt &&
@@ -126,22 +123,13 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           const { product, variationId, hasVariations } = payload
           const tiny = new Tiny(tinyToken)
 
-          const handleTinyStock = ({ produto, tipo }, tinyProduct) => {
-            if (Number(storeId) === 51331) {
-              console.log('Estoque #51331', produto.saldo, produto.estoqueAtual)
-            }            
+          const handleTinyStock = ({ produto, tipo }, tinyProduct) => {         
             let quantity = Number(produto.saldo) || Number(produto.estoqueAtual)
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
-              if (Number(storeId) === 51331) {
-                console.log('Estoque #51331 saldo reservado', produto.codigo, produto.saldoReservado)
-              } 
             }
             if (isNaN(quantity)) {
               quantity = 0
-            }
-            if (Number(storeId) === 51331) {
-              console.log('Estoque #51331', produto.codigo, quantity)
             }
             if (product && (!appData.update_product || variationId)) {
               if (!isNaN(quantity)) {
@@ -157,6 +145,10 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 return appSdk.apiRequest(storeId, endpoint, 'PUT', { quantity }, auth)
               }
               return null
+            } else if (!product && tinyProduct && tipo === 'produto') {
+              return parseProduct(tinyProduct, storeId, auth, true, tipo).then(product => {
+                return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth)
+              })
             } else if (!tinyProduct) {
               return null
             }
@@ -168,7 +160,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 if (productId) {
                   method = 'PATCH'
                   endpoint = `/products/${productId}.json`
-                } else if (tipo === 'produto' || !tipo) {
+                } else if (tipo === 'produto' || appData.import_all_products) {
                   method = 'POST'
                   endpoint = '/products.json'
                 } else {
@@ -225,6 +217,8 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           let job
           if (tinyStockUpdate && isHiddenQueue && productId) {
             job = handleTinyStock(tinyStockUpdate)
+          } else if (tinyStockUpdate.tipo === 'produto' && !productId) {
+            job = handleTinyStock({ produto: {}, tipo: 'produto' }, tinyStockUpdate.produto)
           } else {
             job = tiny.post('/produtos.pesquisa.php', { pesquisa: sku })
               .then(({ produtos }) => {

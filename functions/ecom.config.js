@@ -201,6 +201,15 @@ const app = {
       },
       hide: true
     },
+    import_all_products: {
+      schema: {
+        type: 'boolean',
+        default: false,
+        title: 'Importar todos produtos',
+        description: 'Importar o produto após qualquer alteração do mesmo no tiny'
+      },
+      hide: true
+    },
     update_price: {
       schema: {
         type: 'boolean',
