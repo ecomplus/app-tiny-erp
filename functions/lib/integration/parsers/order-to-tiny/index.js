@@ -30,7 +30,7 @@ module.exports = (order, appData, storeId) => {
       ['province_code', 'uf', 30]
     ].forEach(([addressField, tinyField, maxLength]) => {
       if (address[addressField]) {
-        tinyObject[tinyField] = String(address[addressField]).substring(0, maxLength).replace('&', 'e')
+        tinyObject[tinyField] = String(address[addressField]).substring(0, maxLength).replaceAll('&', 'e')
       }
     })
   }
@@ -38,12 +38,12 @@ module.exports = (order, appData, storeId) => {
   if (buyer) {
     const tinyCustomer = {
       codigo: buyer._id,
-      nome: (buyer.corporate_name || ecomUtils.fullName(buyer))?.substring(0, 30).replace('&', 'e') ||
+      nome: (buyer.corporate_name || ecomUtils.fullName(buyer))?.substring(0, 30).replaceAll('&', 'e') ||
         `Comprador de #${orderRef}`,
       tipo_pessoa: buyer.registry_type === 'j' ? 'J' : 'F'
     }
     if (buyer.display_name) {
-      tinyCustomer.nome_fantasia = buyer.display_name.substring(0, 30).replace('&', 'e')
+      tinyCustomer.nome_fantasia = buyer.display_name.substring(0, 30).replaceAll('&', 'e')
     }
     if (buyer.doc_number && buyer.doc_number.length <= 18) {
       tinyCustomer.cpf_cnpj = buyer.doc_number
