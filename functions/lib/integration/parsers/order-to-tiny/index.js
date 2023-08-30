@@ -167,9 +167,6 @@ module.exports = (order, appData, storeId) => {
       if (amount.tax) {
         tinyOrder.valor_frete += amount.tax
       }
-      if (amount.extra) {
-        tinyOrder.valor_frete += amount.extra
-      }
     }
     if (amount.discount) {
       tinyOrder.valor_desconto = amount.discount
