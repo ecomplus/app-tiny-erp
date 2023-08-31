@@ -69,7 +69,7 @@ module.exports = (order, appData, storeId) => {
     }
   }
 
-  if (shippingAddress && billingAddress) {
+  if (shippingAddress) {
     tinyOrder.endereco_entrega = {}
     parseAddress(shippingAddress, tinyOrder.endereco_entrega)
     if (shippingAddress.name) {
