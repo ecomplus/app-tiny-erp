@@ -62,6 +62,7 @@ module.exports = async (
         }
 
         if (tipo === 'produto' || tipo === 'estoque') {
+          console.log('Webhook', tipo, dados.saldo)
           if ((dados.id || dados.idProduto) && (dados.codigo || dados.sku)) {
             return new Promise((resolve, reject) => {
               const nextId = String(dados.skuMapeamento || dados.sku || dados.codigo)
@@ -76,7 +77,7 @@ module.exports = async (
                 },
                 updatedAt: admin.firestore.Timestamp.fromDate(new Date())
               }
-              console.log(`> Tiny webhook: #${storeId} ${nextId} => ${tinyStockUpdate.produto.saldo}`)
+              console.log(`> Tiny webhook: #${storeId} ${nextId} => ${tinyStockUpdate.produto.saldo}` )
 
               const queueEntry = {
                 nextId,
