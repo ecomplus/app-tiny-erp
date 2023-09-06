@@ -62,7 +62,7 @@ module.exports = async (
         }
 
         if (tipo === 'produto' || tipo === 'estoque') {
-          console.log('Webhook', tipo, dados.saldo)
+          console.log('Webhook', tipo, JSON.stringify(dados))
           if ((dados.id || dados.idProduto) && (dados.codigo || dados.sku)) {
             return new Promise((resolve, reject) => {
               const nextId = String(dados.skuMapeamento || dados.sku || dados.codigo)
