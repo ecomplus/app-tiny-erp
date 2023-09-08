@@ -124,10 +124,12 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           const tiny = new Tiny(tinyToken)
 
           const handleTinyStock = ({ produto, tipo }, tinyProduct) => {         
-            let quantity = Number(produto.saldo) || Number(produto.estoqueAtual)
+            let quantity = Number(produto.saldo || produto.estoqueAtual)
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
             }
+            if (storeId == 51305) {
+              console.log('Importar informação produto #51305', JSON.stringify(produto), product && (!appData.update_product || variationId))
             if (product && (!appData.update_product || variationId)) {
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
