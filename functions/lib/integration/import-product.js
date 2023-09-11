@@ -132,10 +132,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
             }
-            if (storeId == 51305 || storeId == 51265) {
-              console.log('Importar informação produto #51305', JSON.stringify(produto), product && (!appData.update_product || variationId))
-            }
-            if (product && ((!appData.update_product && (tipo !== 'preco') && !(tipo === 'produto' && produto.variacoes && produto.variacoes.length)) || variationId)) {
+            if (product && (!appData.update_product || variationId)) {
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
                   quantity = 0
@@ -153,11 +150,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               return parseProduct(tinyProduct, storeId, auth, true, tipo).then(product => {
                 return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth)
               })
-            } else if (!tinyProduct) {
+            } else if (!tinyProduct || !produto) {
               return null
             }
 
-            return tiny.post('/produto.obter.php', { id: tinyProduct.id })
+            return tiny.post('/produto.obter.php', { id: (tinyProduct.id || produto.id) })
               .then(({ produto }) => {
                 let method, endpoint
                 let productId = product && product._id
@@ -217,7 +214,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               })
           }
 
-          console.log(`#${storeId} ${JSON.stringify({ sku, productId, hasVariations, variationId, hasProduct, product })}`)
+          console.log(`#${storeId} ${JSON.stringify({ sku, productId, hasVariations, variationId, hasProduct })}`)
           let job
           if (tinyStockUpdate && isHiddenQueue && (productId || hasProduct)) {
             job = handleTinyStock(tinyStockUpdate)
