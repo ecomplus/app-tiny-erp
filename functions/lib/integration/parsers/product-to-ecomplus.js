@@ -92,7 +92,9 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo) => new Promise
     body_html: tinyProduct.descricao_complementar || tinyProduct.descricaoComplementar
   }
 
-  product.quantity = tinyProduct.estoqueAtual || 0
+  if (tinyProduct.estoqueAtual) {
+    product.quantity = tinyProduct.estoqueAtual
+  }
 
   if (isNew) {
     if (tinyProduct.seo) {
@@ -221,8 +223,8 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo) => new Promise
               name: `${name} / ${specTexts.join(' / ')}`.substring(0, 100),
               sku: codigo,
               specifications,
-              price: parseFloat(preco || 0),
-              quantity: estoqueAtual || 0,
+              price: parseFloat(preco),
+              quantity: estoqueAtual,
               picture_id: pictureId
             })
           }
