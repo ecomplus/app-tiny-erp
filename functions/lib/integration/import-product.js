@@ -8,6 +8,7 @@ const handleJob = require('./handle-job')
 
 module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, canCreateNew, isHiddenQueue) => {
   const [sku, productId] = String(queueEntry.nextId).split(';:')
+  let hasProduct = false
 
   return new Promise((resolve, reject) => {
     if (queueEntry.tinyStockUpdate) {
@@ -121,6 +122,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             return payload
           }
           const { product, variationId, hasVariations } = payload
+          if (product && product._id) {
+            hasProduct = true
+          } 
           const tiny = new Tiny(tinyToken)
 
           const handleTinyStock = ({ produto, tipo }, tinyProduct) => {         
@@ -128,9 +132,10 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
             }
-            if (storeId == 51305) {
+            if (storeId == 51305 || storeId == 51265) {
               console.log('Importar informação produto #51305', JSON.stringify(produto), product && (!appData.update_product || variationId))
-            if (product && (!appData.update_product || variationId)) {
+            }
+            if (product && ((!appData.update_product && (tipo !== 'preco') && !(tipo === 'produto' && produto.variacoes && produto.variacoes.length)) || variationId)) {
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
                   quantity = 0
@@ -212,11 +217,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               })
           }
 
-          console.log(`#${storeId} ${JSON.stringify({ sku, productId, hasVariations, variationId })}`)
+          console.log(`#${storeId} ${JSON.stringify({ sku, productId, hasVariations, variationId, hasProduct, product })}`)
           let job
-          if (tinyStockUpdate && isHiddenQueue && productId) {
+          if (tinyStockUpdate && isHiddenQueue && (productId || hasProduct)) {
             job = handleTinyStock(tinyStockUpdate)
-          } else if (tinyStockUpdate && tinyStockUpdate.tipo === 'produto' && !productId) {
+          } else if (tinyStockUpdate && tinyStockUpdate.tipo === 'produto' && !(productId || hasProduct) {
             job = handleTinyStock({ produto: {}, tipo: 'produto' }, tinyStockUpdate.produto)
           } else {
             job = tiny.post('/produtos.pesquisa.php', { pesquisa: sku })
