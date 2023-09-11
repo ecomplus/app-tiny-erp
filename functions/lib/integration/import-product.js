@@ -216,9 +216,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
 
           console.log(`#${storeId} ${JSON.stringify({ sku, productId, hasVariations, variationId, hasProduct })}`)
           let job
-          if (tinyStockUpdate && isHiddenQueue && (productId || hasProduct)) {
+          if (tinyStockUpdate && isHiddenQueue && productId) {
             job = handleTinyStock(tinyStockUpdate)
-          } else if (tinyStockUpdate && tinyStockUpdate.tipo === 'produto' && !(productId || hasProduct)) {
+          } else if (tinyStockUpdate && tinyStockUpdate.tipo === 'produto') {
             job = handleTinyStock({ produto: {}, tipo: 'produto' }, tinyStockUpdate.produto)
           } else {
             job = tiny.post('/produtos.pesquisa.php', { pesquisa: sku })
