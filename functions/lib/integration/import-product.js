@@ -130,7 +130,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           const handleTinyStock = ({ produto, tipo }, tinyProduct) => {         
             let quantity = Number(produto.saldo)
             if (!quantity & quantity !== 0) {
-              quantity = Number(product.estoqueAtual)
+              quantity = Number(produto.estoqueAtual)
             }
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
