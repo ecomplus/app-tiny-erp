@@ -127,12 +127,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           } 
           const tiny = new Tiny(tinyToken)
 
-          const handleTinyStock = ({ produto, tipo }, tinyProduct) => { 
-            if (storeId == 51265) {
-              console.log('Estoque antes', JSON.stringify(produto))
-            }        
+          const handleTinyStock = ({ produto, tipo }, tinyProduct) => {         
             let quantity = Number(produto.saldo)
-            if (!quantity) {
+            if (!quantity & quantity !== 0) {
               quantity = Number(product.estoqueAtual)
             }
             if (produto.saldoReservado) {
