@@ -88,6 +88,19 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               pedido: {
                 pedido: tinyOrder
               }
+            }).then(({ status, registros }) => {
+              if (status === 'OK' && registros && registros.registro) {
+                const idTiny = registros.registro.id
+                const isFlashCourier = order.shipping_method_label && order.shipping_method_label.toLowerCase() === 'flash courier'
+                if (storeId === 51301 && idTiny && isFlashCourier && order.number) {
+                  return tiny.post('/cadastrar.codigo.rastreamento.pedido.php', {
+                    id: idTiny,
+                    codigoRastreamento: `MONO${order.number}`,
+                    urlRastreamento: `https://www.flashcourier.com.br/rastreio/MONO${order.number}`
+                  })
+                }
+                return
+              }
             })
           } else {
             console.log(`#${storeId} ${orderId} found with tiny status ${tinyStatus}`)
