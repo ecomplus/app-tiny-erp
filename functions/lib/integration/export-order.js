@@ -99,7 +99,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     urlRastreamento: `https://www.flashcourier.com.br/rastreio/MONO${order.number}`
                   })
                 }
-                return
+                return status
               }
             })
           } else {
