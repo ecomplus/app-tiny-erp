@@ -1,3 +1,4 @@
+const { getFirestore } = require('firebase-admin/firestore')
 const errorHandling = require('../store-api/error-handling')
 const Tiny = require('../tiny/constructor')
 const parseOrder = require('./parsers/order-to-tiny/')
@@ -91,6 +92,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             }).then(({ status, registros }) => {
               if (status === 'OK' && registros && registros.registro) {
                 const idTiny = registros.registro.id
+                getFirestore().doc(`exported_orders/${orderId}`)
+                  .set({ storeId, idTiny })
+                  .catch(console.warn)
                 const isFlashCourier = order.shipping_method_label && order.shipping_method_label.toLowerCase() === 'flash courier'
                 if (storeId === 51301 && idTiny && isFlashCourier && order.number) {
                   return tiny.post('/cadastrar.codigo.rastreamento.pedido.php', {
