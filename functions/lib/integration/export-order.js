@@ -92,6 +92,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             }).then(({ status, registros }) => {
               if (status === 'OK' && registros && registros.registro) {
                 const idTiny = registros.registro.id
+                // DO NOT COPY TO v2
                 getFirestore().doc(`exported_orders/${orderId}`)
                   .set({ storeId, idTiny })
                   .catch(console.warn)

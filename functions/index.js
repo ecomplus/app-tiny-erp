@@ -10,7 +10,7 @@ const handleEventTiny = require('./lib/pubsub/webhook-tiny')
 // Firebase SDKs to setup cloud functions and access Firestore database
 const admin = require('firebase-admin')
 const functions = require('firebase-functions')
-const { onRequest }  = require('firebase-functions/v2/https')
+const { onRequest } = require('firebase-functions/v2/https')
 admin.initializeApp()
 
 // web server with Express
@@ -168,3 +168,11 @@ console.log(`-- Sheduled clearing Tiny stored states '${clearStatesCron}'`)
 
 exports.onTinyEvents = require('./lib/pubsub/create-topic')
   .createEventsFunction('tiny', handleEventTiny)
+
+const checkExportedOrders = require('./lib/integration/check-exported-orders')
+exports.addBazipassMonthly = functions.runWith({ timeoutSeconds: 300 })
+  .pubsub.schedule('12 */8 * * *').onRun(() => {
+    return prepareAppSdk().then(appSdk => {
+      checkExportedOrders({ appSdk })
+    })
+  })
