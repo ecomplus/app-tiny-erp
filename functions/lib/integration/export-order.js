@@ -1,4 +1,4 @@
-const { getFirestore } = require('firebase-admin/firestore')
+const { getFirestore, Timestamp } = require('firebase-admin/firestore')
 const errorHandling = require('../store-api/error-handling')
 const Tiny = require('../tiny/constructor')
 const parseOrder = require('./parsers/order-to-tiny/')
@@ -94,7 +94,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 const idTiny = registros.registro.id
                 // DO NOT COPY TO v2
                 getFirestore().doc(`exported_orders/${orderId}`)
-                  .set({ storeId, idTiny })
+                  .set({
+                    storeId,
+                    idTiny,
+                    exportedAt: Timestamp.now()
+                  })
                   .catch(console.warn)
                 const isFlashCourier = order.shipping_method_label && order.shipping_method_label.toLowerCase() === 'flash courier'
                 if (storeId === 51301 && idTiny && isFlashCourier && order.number) {
