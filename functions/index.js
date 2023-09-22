@@ -170,7 +170,7 @@ exports.onTinyEvents = require('./lib/pubsub/create-topic')
   .createEventsFunction('tiny', handleEventTiny)
 
 const checkExportedOrders = require('./lib/integration/check-exported-orders')
-exports.addBazipassMonthly = functions.runWith({ timeoutSeconds: 300 })
+exports.checkExportedOrders = functions.runWith({ timeoutSeconds: 300 })
   .pubsub.schedule('12 */8 * * *').onRun(() => {
     return prepareAppSdk().then(appSdk => {
       checkExportedOrders({ appSdk })
