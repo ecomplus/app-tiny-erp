@@ -35,6 +35,7 @@ module.exports = async ({ appSdk }) => {
     ordersToQueue.forEach((nextId) => {
       if (!queueList.includes(nextId)) {
         queueList.unshift(nextId)
+        logger.debug(`> add to queue ${nextId}`)
       }
     })
     await updateAppData({ appSdk, storeId }, {
