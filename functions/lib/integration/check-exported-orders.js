@@ -6,7 +6,7 @@ const updateAppData = require('../store-api/update-app-data')
 
 module.exports = async ({ appSdk }) => {
   const d = new Date()
-  d.setHours(d.getHours() - 24)
+  d.setDate(d.getDate() - 12)
   const storeId = 1032
   const endpoint = '/orders.json' +
     '?financial_status.current=paid' +
@@ -19,8 +19,9 @@ module.exports = async ({ appSdk }) => {
   const db = getFirestore()
   const ordersToQueue = []
   for (let i = 0; i < result.length; i++) {
-    const orderId = result[i]
-    if (!(await db.doc(`exported_orders/${orderId}`).get()).exists) {
+    const orderId = result[i]._id
+    const doc = await db.doc(`exported_orders/${orderId}`).get()
+    if (!doc.exists) {
       ordersToQueue.push(orderId)
     }
   }
