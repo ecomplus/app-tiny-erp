@@ -135,6 +135,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
             }
+            if (storeId == 1095) {
+              console.log('Produto', JSON.stringify(tinyProduct))
+            }
             if (product && (!appData.update_product || variationId)) {
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
@@ -151,6 +154,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               return null
             } else if (!product && tinyProduct && tipo === 'produto') {
               return parseProduct(tinyProduct, storeId, auth, true, tipo).then(product => {
+                if (storeId == 1095) {
+                  console.log('Produto 1', JSON.stringify(product))
+                }
                 return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth)
               })
             } else if (!tinyProduct || !produto) {
