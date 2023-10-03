@@ -216,7 +216,7 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo) => new Promise
             }
           }
           if (specTexts.length) {
-            const variationObj = {
+            const variationPlus = {
               _id: ecomUtils.randomObjectId(),
               name: `${name} / ${specTexts.join(' / ')}`.substring(0, 100),
               sku: codigo,
@@ -227,7 +227,7 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo) => new Promise
             if (price !== parseFloat(preco)) {
               variacaoObj.price = parseFloat(preco)
             }
-            product.variations.push(variacaoObj)
+            product.variations.push(variationPlus)
           }
         }
       })
