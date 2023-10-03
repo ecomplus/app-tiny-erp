@@ -157,7 +157,12 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 if (storeId == 1095) {
                   console.log('Produto 1', JSON.stringify(product))
                 }
-                return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth)
+                return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth).then(response => {
+                  console.log('Produto criado com sucesso')
+                  return response
+                }).catch(err => {
+                  console.log(err)
+                })
               })
             } else if (!tinyProduct || !produto) {
               return null
