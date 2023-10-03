@@ -171,7 +171,7 @@ exports.onTinyEvents = require('./lib/pubsub/create-topic')
 
 const checkExportedOrders = require('./lib/integration/check-exported-orders')
 exports.checkExportedOrders = functions.runWith({ timeoutSeconds: 300 })
-  .pubsub.schedule('26 * * * *').onRun(() => {
+  .pubsub.schedule('12 * * * *').onRun(() => {
     return prepareAppSdk().then(appSdk => {
       checkExportedOrders({ appSdk })
     })
