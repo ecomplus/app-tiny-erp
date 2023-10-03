@@ -81,13 +81,13 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo) => new Promise
   const getCorrectPrice = (price) => {
     return Number(price) > 0 ? Number(price) : null
   }
-
+  const price = !isProduct ? Number(tinyProduct.preco_promocional || tinyProduct.preco) : Number(getCorrectPrice(tinyProduct.precoPromocional) || tinyProduct.preco)
   const product = {
     available: tinyProduct.situacao === 'A',
     sku,
     name,
     cost_price: !isProduct ? Number(tinyProduct.preco_custo) : Number(tinyProduct.precoCusto),
-    price: !isProduct ? Number(tinyProduct.preco_promocional || tinyProduct.preco) : Number(getCorrectPrice(tinyProduct.precoPromocional) || tinyProduct.preco),
+    price,
     base_price: Number(tinyProduct.preco),
     body_html: tinyProduct.descricao_complementar || tinyProduct.descricaoComplementar
   }
@@ -208,25 +208,26 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo) => new Promise
                 specifications[gridId] = [spec]
               })
           }
-          let pictureId
+          let pictureId = 0
           if (Array.isArray(anexos) && anexos.length && Array.isArray(tinyProduct.anexos) && tinyProduct.anexos.length) {
             pictureId = tinyProduct.anexos.length
             for (const anexo of anexos) {
               tinyProduct.anexos.push(anexo)
             }
-          } else if (Array.isArray(tinyProduct.anexos) && tinyProduct.anexos.length) {
-            pictureId = 0
           }
           if (specTexts.length) {
-            product.variations.push({
+            const variationObj = {
               _id: ecomUtils.randomObjectId(),
               name: `${name} / ${specTexts.join(' / ')}`.substring(0, 100),
               sku: codigo,
               specifications,
-              price: parseFloat(preco),
               quantity: estoqueAtual,
               picture_id: pictureId
-            })
+            }
+            if (price !== parseFloat(preco)) {
+              variacaoObj.price = parseFloat(preco)
+            }
+            product.variations.push(variacaoObj)
           }
         }
       })
