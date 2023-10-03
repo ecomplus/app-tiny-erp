@@ -6,7 +6,7 @@ const updateAppData = require('../store-api/update-app-data')
 
 module.exports = async ({ appSdk }) => {
   const d = new Date()
-  d.setHours(d.getHours() - 12)
+  d.setHours(d.getHours() - 24)
   const storeId = 1032
   const endpoint = '/orders.json' +
     '?financial_status.current=paid' +
@@ -32,7 +32,7 @@ module.exports = async ({ appSdk }) => {
     if (!Array.isArray(queueList)) {
       queueList = []
     }
-    ordersToQueue.forEach((nextId) => {
+    ordersToQueue.forEach(({ _id: nextId }) => {
       if (!queueList.includes(nextId)) {
         queueList.unshift(nextId)
         logger.debug(`> add to queue ${nextId}`)
