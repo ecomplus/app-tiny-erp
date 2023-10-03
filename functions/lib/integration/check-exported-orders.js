@@ -20,10 +20,10 @@ module.exports = async ({ appSdk }) => {
   const db = getFirestore()
   const ordersToQueue = []
   for (let i = 0; i < result.length; i++) {
-    const orderId = result[i]._id
-    const doc = await db.doc(`exported_orders/${orderId}`).get()
+    const order = result[i]
+    const doc = await db.doc(`exported_orders/${order._id}`).get()
     if (!doc.exists) {
-      ordersToQueue.push(orderId)
+      ordersToQueue.push(order)
     }
   }
   if (ordersToQueue.length) {
