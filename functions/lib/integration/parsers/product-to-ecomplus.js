@@ -99,7 +99,7 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo) => new Promise
   if (isNew) {
     if (tinyProduct.seo) {
       if (tinyProduct.seo.slug && tinyProduct.seo.slug.length) {
-        product.slug = tinyProduct.seo.slug
+        product.slug = tinyProduct.seo.slug.trim()
       }
       if (tinyProduct.seo.title && tinyProduct.seo.title.length) {
         product.meta_title = tinyProduct.seo.title.slice(0, 254)

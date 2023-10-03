@@ -135,9 +135,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
             }
-            if (storeId == 1095) {
-              console.log('Produto', JSON.stringify(tinyProduct))
-            }
+
             if (product && (!appData.update_product || variationId)) {
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
@@ -154,9 +152,6 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               return null
             } else if (!product && tinyProduct && tipo === 'produto') {
               return parseProduct(tinyProduct, storeId, auth, true, tipo).then(product => {
-                if (storeId == 1095) {
-                  console.log('Produto 1', JSON.stringify(product))
-                }
                 return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth).then(response => {
                   console.log('Produto criado com sucesso')
                   return response
@@ -184,9 +179,6 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 return parseProduct(produto, storeId, auth, method === 'POST').then(product => {
                   if (!isNaN(quantity)) {
                     product.quantity = quantity >= 0 ? quantity : 0
-                  }
-                  if (storeId == 1095) {
-                    console.log('Produto', JSON.stringify(product))
                   }
                   console.log(`#${storeId} ${method} ${endpoint} ${product.sku} ${product.price} ${product.quantity}`)
                   const promise = appSdk.apiRequest(storeId, endpoint, method, product, auth)
