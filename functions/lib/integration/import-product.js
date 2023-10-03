@@ -174,6 +174,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   if (!isNaN(quantity)) {
                     product.quantity = quantity >= 0 ? quantity : 0
                   }
+                  if (storeId == 1095) {
+                    console.log('Produto', JSON.stringify(product))
+                  }
                   console.log(`#${storeId} ${method} ${endpoint} ${product.sku} ${product.price} ${product.quantity}`)
                   const promise = appSdk.apiRequest(storeId, endpoint, method, product, auth)
 
