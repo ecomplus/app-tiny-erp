@@ -100,7 +100,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 variationId: variation._id,
                 hasVariations
               }
-            } else if (!variation) {
+            } else if (!variation && appData.update_product) {
               return {
                 product,
                 hasVariations
