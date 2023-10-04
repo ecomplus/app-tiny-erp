@@ -100,6 +100,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 variationId: variation._id,
                 hasVariations
               }
+            } else if (!variation) {
+              return {
+                product,
+                hasVariations
+              }
             } else if (isHiddenQueue) {
               return null
             } else if (!appData.update_product) {
