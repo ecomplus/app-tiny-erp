@@ -181,7 +181,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 } else {
                   return null
                 }
-                return parseProduct(produto, storeId, auth, method === 'POST').then(product => {
+                return parseProduct(produto, storeId, auth, method === 'POST', false, appData).then(product => {
                   if (!isNaN(quantity)) {
                     product.quantity = quantity >= 0 ? quantity : 0
                   }

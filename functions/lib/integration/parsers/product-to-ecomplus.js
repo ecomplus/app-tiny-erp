@@ -74,7 +74,7 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
   return picture
 })
 
-module.exports = (tinyProduct, storeId, auth, isNew = true, tipo) => new Promise((resolve, reject) => {
+module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => new Promise((resolve, reject) => {
   const sku = tinyProduct.codigo || String(tinyProduct.id)
   const name = (tinyProduct.nome || sku).trim()
   const isProduct = tipo === 'produto'
@@ -90,6 +90,10 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo) => new Promise
     price,
     base_price: Number(tinyProduct.preco),
     body_html: tinyProduct.descricao_complementar || tinyProduct.descricaoComplementar
+  }
+
+  if (appData && appData.disable_price && !isNew) {
+    delete product.price
   }
 
   if (tinyProduct.estoqueAtual) {

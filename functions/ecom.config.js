@@ -219,6 +219,15 @@ const app = {
       },
       hide: true
     },
+    disable_price: {
+      schema: {
+        type: 'boolean',
+        default: false,
+        title: 'Desabilitar importação de preços',
+        description: 'Desabilitar importação de preços após importação do produto'
+      },
+      hide: true
+    },
     exportation: {
       schema: {
         title: 'Exportação manual',
