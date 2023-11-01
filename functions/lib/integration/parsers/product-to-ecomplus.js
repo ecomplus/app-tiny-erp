@@ -92,7 +92,7 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
     body_html: tinyProduct.descricao_complementar || tinyProduct.descricaoComplementar
   }
 
-  if (appData && appData.disable_price && !isNew) {
+  if (appData && appData.disable_price && !isNew && !isProduct) {
     delete product.price
   }
 
