@@ -140,7 +140,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
             }
-
+            if (storeId == 3967) {
+              console.log('has product', hasProduct, 'hasTiny:', JSON.stringify(tinyProduct), 'type product:', tipo)
+            }
             if (product && (!appData.update_product || variationId)) {
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
