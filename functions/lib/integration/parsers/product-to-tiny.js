@@ -93,7 +93,7 @@ module.exports = (product, originalTinyProduct, appData, storeId) => {
     tinyProduct.categoria = product.categories.map(({ name }) => name).join(' >> ')
   }
 
-  if (product.pictures && product.pictures.length) {
+  if (product.pictures && product.pictures.length && !appData.disable_image_exportation) {
     tinyProduct.anexos = []
     product.pictures.forEach(({ zoom, big, normal }) => {
       const img = (zoom || big || normal)

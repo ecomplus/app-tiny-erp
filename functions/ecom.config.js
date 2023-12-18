@@ -228,6 +228,15 @@ const app = {
       },
       hide: true
     },
+    disable_image_exportation: {
+      schema: {
+        type: 'boolean',
+        default: false,
+        title: 'Desabilitar exportação de imagem de produto',
+        description: 'Desabilitar exportação da imagem do produto ao exportar o produto'
+      },
+      hide: true
+    },
     exportation: {
       schema: {
         title: 'Exportação manual',
