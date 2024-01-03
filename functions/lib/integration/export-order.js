@@ -24,6 +24,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
         return null
       }
       const tiny = new Tiny(tinyToken)
+      let { metafields } = order
       console.log(`#${storeId} ${orderId} searching order ${order.number}`)
       if (getOrderUpdateType(order) === 'fulfillment') {
         const fulfillmentStatus = order.fulfillment_status && order.fulfillment_status.current
@@ -89,10 +90,23 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               pedido: {
                 pedido: tinyOrder
               }
-            }).then(({ status, registros }) => {
+            }).then(async ({ status, registros }) => {
               if (status === 'OK' && registros && registros.registro) {
                 const idTiny = registros.registro.id
                 // DO NOT COPY TO v2
+                if (!metafields) {
+                  metafields = []
+                }
+                metafields.push({
+                  _id: ecomUtils.randomObjectId(),
+                  namespace: 'tiny',
+                  field: 'tiny:id',
+                  value: String(idTiny)
+                })
+                await appSdk.apiRequest(storeId, `/orders/${orderId}.json`, 'PATCH', {
+                  metafields
+                }, auth)
+                .catch(console.error)
                 getFirestore().doc(`exported_orders/${orderId}`)
                   .set({
                     storeId,
