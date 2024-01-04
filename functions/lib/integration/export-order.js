@@ -5,6 +5,7 @@ const parseOrder = require('./parsers/order-to-tiny/')
 const parseStatus = require('./parsers/order-to-tiny/status')
 const getOrderUpdateType = require('./helpers/get-order-update-type')
 const handleJob = require('./handle-job')
+const ecomUtils = require('@ecomplus/utils')
 
 module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, canCreateNew) => {
   const orderId = queueEntry.nextId
