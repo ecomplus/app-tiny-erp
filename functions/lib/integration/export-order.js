@@ -103,10 +103,16 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   field: 'tiny:id',
                   value: String(idTiny)
                 })
-                await appSdk.apiRequest(storeId, `/orders/${orderId}.json`, 'PATCH', {
-                  metafields
-                }, auth)
-                .catch(console.error)
+                console.log('Send metafields', JSON.stringify(metafields))
+                try {
+                  await appSdk.apiRequest(storeId, `/orders/${orderId}.json`, 'PATCH', {
+                    metafields
+                  }, auth)
+                  console.log('deu certo o envio do metafield')
+                } catch (error) {
+                  console.log('deu erro no envio do metafield', console.log(error)) 
+                }
+                
                 getFirestore().doc(`exported_orders/${orderId}`)
                   .set({
                     storeId,
