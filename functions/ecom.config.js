@@ -413,6 +413,11 @@ procedures.push({
       resource: 'orders',
       field: 'fulfillment_status',
     },
+    {
+      resource: 'orders',
+      subresource: 'shipping_lines',
+      field: 'to',
+    },
 
     // Receive notifications when products/variations prices changes:
     {
