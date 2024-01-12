@@ -19,7 +19,7 @@ module.exports = (order, appData, storeId) => {
   const shippingAddress = shippingLine && shippingLine.to
   const billingAddress = transaction && transaction.billing_address
 
-  const parseAddress = (address, tinyObject) => {
+  const parseAddress = (address, tinyObject, appData) => {
     ;[
       ['street', 'endereco', 50],
       ['number', 'numero', 10],
@@ -31,6 +31,8 @@ module.exports = (order, appData, storeId) => {
     ].forEach(([addressField, tinyField, maxLength]) => {
       if (address[addressField]) {
         tinyObject[tinyField] = String(address[addressField]).substring(0, maxLength).replaceAll('&', 'e')
+      } else if (tinyField === 'numero' && appData.non_number) {
+        tinyObject['numero'] = '0'
       }
     })
   }
@@ -55,7 +57,7 @@ module.exports = (order, appData, storeId) => {
       tinyCustomer.email = buyer.main_email
     }
     if (shippingAddress) {
-      parseAddress(billingAddress || shippingAddress, tinyCustomer)
+      parseAddress(billingAddress || shippingAddress, tinyCustomer, appData)
     }
     const phone = buyer.phones && buyer.phones[0]
     if (phone) {
@@ -71,7 +73,7 @@ module.exports = (order, appData, storeId) => {
 
   if (shippingAddress) {
     tinyOrder.endereco_entrega = {}
-    parseAddress(shippingAddress, tinyOrder.endereco_entrega)
+    parseAddress(shippingAddress, tinyOrder.endereco_entrega, appData)
     if (shippingAddress.name) {
       tinyOrder.endereco_entrega.nome_destinatario = shippingAddress.name.substring(0, 60).replaceAll('&', 'e')
     }

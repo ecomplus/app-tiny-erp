@@ -237,6 +237,15 @@ const app = {
       },
       hide: true
     },
+    non_number: {
+      schema: {
+        type: 'boolean',
+        default: false,
+        title: 'Enviar número zero quando endereço não existir número',
+        description: 'Quando não existe número, por padrão enviamos sem esse número, porém pode dar erro de sincronização com outras integrações vinculadas ao tiny'
+      },
+      hide: true
+    },
     exportation: {
       schema: {
         title: 'Exportação manual',
