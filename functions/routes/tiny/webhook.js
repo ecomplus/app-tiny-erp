@@ -23,9 +23,6 @@ exports.post = ({ appSdk, admin }, req, res) => {
   if (storeId > 100 && typeof tinyToken === 'string' && tinyToken && req.body) {
     const { dados, tipo } = req.body
     if (dados) {
-      if (storeId == 51331) {
-        console.log('dados', JSON.stringify(dados))
-      }
       /*
       TODO: check Tiny server IPs
       const clientIp = req.get('x-forwarded-for') || req.connection.remoteAddress
