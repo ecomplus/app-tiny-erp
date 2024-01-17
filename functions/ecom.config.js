@@ -367,7 +367,7 @@ const app = {
                 'Autorizado',
                 'Pago',
                 'Em disputa',
-                'Devolvido',
+                'Estornado',
                 'Cancelado',
                 'Em produção',
                 'Em separação',

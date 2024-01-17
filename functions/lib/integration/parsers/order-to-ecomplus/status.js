@@ -1,4 +1,46 @@
-module.exports = situacao => {
+module.exports = (situacao, mapStatus) => {
+  const parsePaymentStatus = (status) => {
+    switch (status) {
+      case 'Pendente':
+        return 'pending'
+      case 'Em análise':
+        return 'under_analysis'
+      case 'Autorizado':
+        return 'authorized'
+      case 'Pago':
+        return 'paid'
+      case 'Em disputa':
+        return 'in_dispute'
+      case 'Estornado':
+        return 'refunded'
+      case 'Cancelado':
+        return 'voided'
+        break;   
+    }
+  }
+  const parseShippingStatus = (status) => {
+    switch (status) {
+      case 'Em produção':
+        return 'in_production'
+      case 'Em separação':
+        return 'in_separation'
+      case 'NF emitida':
+        return 'invoice_issued'
+      case 'Pronto para envio':
+        return 'ready_for_shipping'
+      case 'Enviado':
+        return 'shipped'
+      case 'Devolvido':
+        return 'returned'
+      case 'Entregue':
+        return 'delivered'
+      case 'Aguardando troca':
+        return 'received_for_exchange'
+      case 'Retorno e troca':
+        return 'returned_for_exchange'
+        break;   
+    }
+  }
   let financialStatus, fulfillmentStatus
   switch (situacao) {
     case 'aprovado':
