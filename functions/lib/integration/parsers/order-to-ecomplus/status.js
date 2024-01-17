@@ -69,5 +69,13 @@ module.exports = (situacao, mapStatus) => {
       financialStatus = 'voided'
       break
   }
+
+  if (Array.isArray(mapStatus) && mapStatus.length) {
+    const currentStatus = mapStatus.find(({tiny_status}) => tiny_status === situacao)
+    if (currentStatus && currentStatus.ecom_status) {
+      financialStatus = parsePaymentStatus(currentStatus.ecom_status)
+      fulfillmentStatus = parseShippingStatus(currentStatus.ecom_status)
+    }
+  }
   return { financialStatus, fulfillmentStatus }
 }
