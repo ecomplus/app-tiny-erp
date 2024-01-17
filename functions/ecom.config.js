@@ -349,6 +349,56 @@ const app = {
       },
       hide: true
     },
+    tiny_map_status: {
+      schema: {
+        title: 'Mapeamento de Status',
+        type: 'array',
+        maxItems: 30,
+        items: {
+          title: 'Relacionar status',
+          description: 'Escolha a equivalência de um status tiny para um status ecomplus',
+          type: 'object',
+          properties: {
+            ecom_status: {
+              type: 'string',
+              enum: [
+                'Pendente', 
+                'Em análise',
+                'Autorizado',
+                'Pago',
+                'Em disputa',
+                'Devolvido',
+                'Cancelado',
+                'Em produção',
+                'Em separação',
+                'NF emitida',
+                'Pronto para envio',
+                'Enviado',
+                'Entregue',
+                'Aguardando troca',
+                'Devolvido',
+                'Retorno e troca' 
+              ],
+              title: 'Status E-Com Plus'
+            },
+            tiny_status: {
+              type: 'string',
+              enum: [
+                'Em aberto', 
+                'Aprovado',
+                'Preparando envio',
+                'Faturado',
+                'Pronto para envio',
+                'Enviado',
+                'Entregue'
+              ],
+              title: 'Status Tiny'
+            }
+          }
+        }
+      },
+      hide: false
+    },
     logs: {
       schema: {
         title: 'Logs',
