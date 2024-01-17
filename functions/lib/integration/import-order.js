@@ -57,8 +57,8 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   promises.push(appSdk
                     .apiRequest(storeId, `/orders/${order._id}.json`, 'PATCH', partialOrder, auth))
                 }
-                const mapStatus = appData.tiny_map_status
-                const { fulfillmentStatus, financialStatus } = parseStatus(situacao, mapStatus = [])
+                const mapStatus = appData.tiny_map_status ||[]
+                const { fulfillmentStatus, financialStatus } = parseStatus(situacao, mapStatus)
                 const data = {
                   date_time: new Date().toISOString(),
                   flags: ['from-tiny']
