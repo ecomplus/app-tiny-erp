@@ -76,7 +76,7 @@ module.exports = (situacao, mapStatus) => {
     if (4566 == storeId) {
       console.log('Inside mapping')
     }
-    const currentStatus = mapStatus.find(({tiny_status}) => tiny_status === situacao)
+    const currentStatus = mapStatus.find(({tiny_status}) => tiny_status.toLowerCase() === situacao.toLowerCase())
     if (4566 == storeId) {
       console.log('Find current status', JSON.stringify(currentStatus))
     }
