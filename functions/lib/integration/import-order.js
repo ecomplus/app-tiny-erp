@@ -58,6 +58,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     .apiRequest(storeId, `/orders/${order._id}.json`, 'PATCH', partialOrder, auth))
                 }
                 const mapStatus = appData.tiny_map_status ||[]
+                if (4566 == storeId) {
+                  console.log('Mapeando status', JSON.stringify(mapStatus))
+                }
                 const { fulfillmentStatus, financialStatus } = parseStatus(situacao, mapStatus)
                 const data = {
                   date_time: new Date().toISOString(),

@@ -69,12 +69,23 @@ module.exports = (situacao, mapStatus) => {
       financialStatus = 'voided'
       break
   }
-
+  if (4566 == storeId) {
+    console.log('Mapeando status in function', JSON.stringify(mapStatus))
+  }
   if (Array.isArray(mapStatus) && mapStatus.length) {
+    if (4566 == storeId) {
+      console.log('Inside mapping')
+    }
     const currentStatus = mapStatus.find(({tiny_status}) => tiny_status === situacao)
+    if (4566 == storeId) {
+      console.log('Find current status', JSON.stringify(currentStatus))
+    }
     if (currentStatus && currentStatus.ecom_status) {
       financialStatus = parsePaymentStatus(currentStatus.ecom_status)
       fulfillmentStatus = parseShippingStatus(currentStatus.ecom_status)
+    }
+    if (4566 == storeId) {
+      console.log('Result mapping', financialStatus, fulfillmentStatus)
     }
   }
   return { financialStatus, fulfillmentStatus }
