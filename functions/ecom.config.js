@@ -391,7 +391,10 @@ const app = {
                 'Faturado',
                 'Pronto para envio',
                 'Enviado',
-                'Entregue'
+                'Entregue',
+                'Não entregue',
+                'Dados incompletos',
+                'Cancelado'
               ],
               title: 'Status Tiny'
             }
