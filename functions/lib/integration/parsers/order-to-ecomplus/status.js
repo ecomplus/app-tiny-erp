@@ -1,4 +1,4 @@
-module.exports = (situacao, mapStatus) => {
+module.exports = (situacao, mapStatus, storeId) => {
   const parsePaymentStatus = (status) => {
     switch (status) {
       case 'Pendente':

@@ -61,7 +61,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 if (4566 == storeId) {
                   console.log('Mapeando status', JSON.stringify(mapStatus))
                 }
-                const { fulfillmentStatus, financialStatus } = parseStatus(situacao, mapStatus)
+                const { fulfillmentStatus, financialStatus } = parseStatus(situacao, mapStatus, storeId)
                 const data = {
                   date_time: new Date().toISOString(),
                   flags: ['from-tiny']
