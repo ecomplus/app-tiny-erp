@@ -378,7 +378,7 @@ const app = {
                 'Aguardando troca',
                 'Devolvido',
                 'Retorno e troca',
-                'Nulo' 
+                'Não alterar status' 
               ],
               title: 'Status E-Com Plus'
             },
