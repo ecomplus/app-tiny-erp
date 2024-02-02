@@ -27,7 +27,8 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
       const tiny = new Tiny(tinyToken)
       let { metafields } = order
       console.log(`#${storeId} ${orderId} searching order ${order.number}`)
-      if (getOrderUpdateType(order) === 'fulfillment') {
+      const orderUpdateType = getOrderUpdateType(order)
+      if (orderUpdateType === 'fulfillment') {
         const fulfillmentStatus = order.fulfillment_status && order.fulfillment_status.current
         if (fulfillmentStatus && Array.isArray(order.fulfillments)) {
           const fulfillmentFromTiny = order.fulfillments.find(({ status, flags }) => {
@@ -142,6 +143,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             })
           } else {
             console.log(`#${storeId} ${orderId} found with tiny status ${tinyStatus}`)
+          }
+
+          if (appData.update_financial_orders_only && orderUpdateType === 'fulfillment') {
+            console.log(`#${storeId} ${orderId} skipped ${tinyStatus} to be a fulfillment`)
+            return null
           }
 
           if (tinyStatus) {
