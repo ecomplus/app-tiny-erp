@@ -165,6 +165,14 @@ const app = {
       },
       hide: true
     },
+    update_financial_orders_only: {
+      schema: {
+        type: 'boolean',
+        default: false,
+        title: 'Atualizar apenas status financeiro'
+      },
+      hide: true
+    },
     ready_for_shipping_only: {
       schema: {
         type: 'boolean',
