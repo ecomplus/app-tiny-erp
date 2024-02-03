@@ -105,12 +105,12 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   field: 'tiny:id',
                   value: String(idTiny)
                 })
-                if (appData.id_ecommerce) {
+                if (appData.tiny_order_data && appData.tiny_order_data.id_ecommerce) {
                   metafields.push({
                     _id: ecomUtils.randomObjectId(),
                     namespace: 'tiny',
                     field: 'tiny:store',
-                    value: String(appData.id_ecommerce)
+                    value: String(appData.tiny_order_data.id_ecommerce)
                   })
                 }
                 console.log('Send metafields', JSON.stringify(metafields))
