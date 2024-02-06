@@ -35,22 +35,22 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
               return null
             }
           }
-          const tinyProduct = parseProduct(product, originalTinyProduct, appData, storeId)
-          const promises = []
-          const path = originalTinyProduct ? '/produto.alterar.php' : '/produto.incluir.php'
-          promises.push(tiny.post(path, {
-            produto: {
-              produtos: [{
-                produto: tinyProduct
-              }]
-            }
-          }))
+
           try {
+            const tinyProduct = parseProduct(product, originalTinyProduct, appData, storeId)
+            const promises = []
+            const path = originalTinyProduct ? '/produto.alterar.php' : '/produto.incluir.php'
+            promises.push(tiny.post(path, {
+              produto: {
+                produtos: [{
+                  produto: tinyProduct
+                }]
+              }
+            }))
             if (tinyProduct.variacoes && tinyProduct.variacoes.length && product) {
               for (let index = 0; index < tinyProduct.variacoes.length; index++) {
-                const variacao = tinyProduct.variacoes[index];
-                console.log('variacao tiny', JSON.stringify(variacao))
-                const tinyProductVariation = parseProductVariation(product, variacao, originalTinyProduct, appData, storeId)
+                await new Promise((resolve) => setTimeout(resolve, 500))
+                const tinyProductVariation = parseProductVariation(product, tinyProduct.variacoes[index], originalTinyProduct, appData, storeId)
                 promises.push(tiny.post(path, {
                   produto: {
                     produtos: [{
