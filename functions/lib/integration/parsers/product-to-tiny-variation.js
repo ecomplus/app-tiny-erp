@@ -1,7 +1,8 @@
 const ecomUtils = require('@ecomplus/utils')
 
 module.exports = (ecomProduct, variation, originalTinyProduct, appData, storeId) => {
-  const ecomVariation = ecomProduct.variations.find(({sku}) => sku === variation.codigo)
+  const { variacao } = variation
+  const ecomVariation = ecomProduct.variations.find(({sku}) => sku === variacao.codigo)
 
   const product = {
     ...ecomProduct,
@@ -108,6 +109,12 @@ module.exports = (ecomProduct, variation, originalTinyProduct, appData, storeId)
         })
       }
     })
+  }
+
+  if (variacao && variacao.grade) {
+    tinyProduct.grade = {
+      ...variacao.grade
+    }
   }
 
   return tinyProduct
