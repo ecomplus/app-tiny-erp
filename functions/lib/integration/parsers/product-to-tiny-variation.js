@@ -1,10 +1,10 @@
 const ecomUtils = require('@ecomplus/utils')
 
-module.exports = (productEcom, variation, originalTinyProduct, appData, storeId) => {
-  const ecomVariation = productEcom.variations.find(({sku}) => sku === variation.codigo)
+module.exports = (ecomProduct, variation, originalTinyProduct, appData, storeId) => {
+  const ecomVariation = ecomProduct.variations.find(({sku}) => sku === variation.codigo)
 
   const product = {
-    ...productECom,
+    ...ecomProduct,
     ...ecomVariation
   }
 
