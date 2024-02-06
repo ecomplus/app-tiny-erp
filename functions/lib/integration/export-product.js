@@ -49,7 +49,7 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
             if (tinyProduct.variacoes && tinyProduct.variacoes.length && product) {
               for (let index = 0; index < tinyProduct.variacoes.length; index++) {
                 const variacao = tinyProduct.variacoes[index];
-                console.log('variacao tiny', JSON.stringify(product), JSON.stringify(variacao), JSON.stringify(originalTinyProduct))
+                console.log('variacao tiny', JSON.stringify(variacao))
                 const tinyProductVariation = parseProductVariation(product, variacao, originalTinyProduct, appData, storeId)
                 promises.push(tiny.post(path, {
                   produto: {

@@ -15,7 +15,7 @@ module.exports = (ecomProduct, variation, originalTinyProduct, appData, storeId)
     tipo: 'P',
     classe_produto: 'V',
     codigo: variation.codigo,
-    nome: ecomVariation.replaceAll('/', '-'),
+    nome: ecomVariation.name.replaceAll('/', '-'),
     unidade: originalTinyProduct && originalTinyProduct.unidade
       ? originalTinyProduct.unidade
       : product.measurement && product.measurement.unit !== 'oz' && product.measurement.unit !== 'ct'
