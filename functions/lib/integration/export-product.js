@@ -7,6 +7,7 @@ const handleJob = require('./handle-job')
 
 module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreateNew) => {
   const productId = queueEntry.nextId
+  console.log('product to export')
   return ecomClient.store({
     storeId,
     url: `/products/${productId}.json`
@@ -49,6 +50,7 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
               for (let index = 0; index < tinyProduct.variacoes.length; index++) {
                 const variacao = tinyProduct.variacoes[index];
                 const tinyProductVariation = parseProductVariation(product, variacao, originalTinyProduct, appData, storeId)
+                console.log('variacao tiny', tinyProductVariation)
                 promises.push(tiny.post(path, {
                   produto: {
                     produtos: [{
