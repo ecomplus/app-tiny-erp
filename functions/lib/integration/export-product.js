@@ -46,7 +46,7 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
             }
           }))
           try {
-            if (tinyProduct.variacoes && tinyProduct.variacoes.length) {
+            if (tinyProduct.variacoes && tinyProduct.variacoes.length && product) {
               for (let index = 0; index < tinyProduct.variacoes.length; index++) {
                 const variacao = tinyProduct.variacoes[index];
                 console.log('variacao tiny', JSON.stringify(product), JSON.stringify(variacao), JSON.stringify(originalTinyProduct))
