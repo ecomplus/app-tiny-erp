@@ -2,6 +2,7 @@ const ecomClient = require('@ecomplus/client')
 const errorHandling = require('../store-api/error-handling')
 const Tiny = require('../tiny/constructor')
 const parseProduct = require('./parsers/product-to-tiny')
+const parseProductVariation = require('./parsers/product-to-tiny-variation')
 const handleJob = require('./handle-job')
 
 module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreateNew) => {
@@ -23,7 +24,7 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
           throw err
         })
 
-        .then(({ produtos }) => {
+        .then(async ({ produtos }) => {
           let originalTinyProduct
           if (Array.isArray(produtos)) {
             originalTinyProduct = produtos.find(({ produto }) => product.sku === String(produto.codigo))
@@ -34,15 +35,35 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
             }
           }
           const tinyProduct = parseProduct(product, originalTinyProduct, appData, storeId)
-          return tinyProduct
-            ? tiny.post(originalTinyProduct ? '/produto.alterar.php' : '/produto.incluir.php', {
-              produto: {
-                produtos: [{
-                  produto: tinyProduct
-                }]
+          const promises = []
+          const path = originalTinyProduct ? '/produto.alterar.php' : '/produto.incluir.php'
+          promises.push(tiny.post(path, {
+            produto: {
+              produtos: [{
+                produto: tinyProduct
+              }]
+            }
+          }))
+          try {
+            if (tinyProduct.variacoes && tinyProduct.variacoes.length) {
+              for (let index = 0; index < tinyProduct.variacoes.length; index++) {
+                const variacao = tinyProduct.variacoes[index];
+                const tinyProductVariation = parseProductVariation(product, variacao, originalTinyProduct, appData, storeId)
+                promises.push(tiny.post(path, {
+                  produto: {
+                    produtos: [{
+                      produto: tinyProductVariation
+                    }]
+                  }
+                }))
               }
+            }
+            return Promise.all(promises).then(results => {
+              console.log(results)
             })
-            : null
+          } catch (error) {
+            console.log('error from sending to tiny', error)
+          }
         })
       handleJob({ appSdk, storeId }, queueEntry, job)
     })
