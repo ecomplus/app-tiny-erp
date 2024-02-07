@@ -1,8 +1,8 @@
 const ecomClient = require('@ecomplus/client')
+const admin = require('firebase-admin')
 const errorHandling = require('../store-api/error-handling')
 const Tiny = require('../tiny/constructor')
 const parseProduct = require('./parsers/product-to-tiny')
-const parseProductVariation = require('./parsers/product-to-tiny-variation')
 const handleJob = require('./handle-job')
 
 module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreateNew) => {
@@ -36,36 +36,30 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
             }
           }
 
-          try {
-            const tinyProduct = parseProduct(product, originalTinyProduct, appData, storeId)
-            const promises = []
-            const path = originalTinyProduct ? '/produto.alterar.php' : '/produto.incluir.php'
-            promises.push(tiny.post(path, {
-              produto: {
-                produtos: [{
-                  produto: tinyProduct
-                }]
-              }
-            }))
-            if (tinyProduct.variacoes && tinyProduct.variacoes.length && product) {
-              for (let index = 0; index < tinyProduct.variacoes.length; index++) {
-                await new Promise((resolve) => setTimeout(resolve, 500))
-                const tinyProductVariation = parseProductVariation(product, tinyProduct.variacoes[index], originalTinyProduct, appData, storeId)
-                promises.push(tiny.post(path, {
-                  produto: {
-                    produtos: [{
-                      produto: tinyProductVariation
-                    }]
-                  }
-                }))
-              }
+          const tinyProduct = parseProduct(product, originalTinyProduct, appData, storeId)
+          const path = originalTinyProduct ? '/produto.alterar.php' : '/produto.incluir.php'
+          return tiny.post(path, {
+            produto: {
+              produtos: [{
+                produto: tinyProduct
+              }]
             }
-            return Promise.all(promises).then(results => {
-              console.log(results)
-            })
-          } catch (error) {
-            console.log('error from sending to tiny', error)
-          }
+          }).then(async result => {
+            console.log(path, 'created or edited product on tiny')
+            if (tinyProduct.variacoes && tinyProduct.variacoes.length && product) {
+              const documentRef = require('firebase-admin')
+                .firestore()
+                .doc(`variations/${storeId}`)
+                await documentRef.set({
+                  storeId,
+                  product,
+                  variations: tinyProduct.variacoes,
+                  originalTinyProduct,
+                  appData,
+                  queuedAt: admin.firestore.Timestamp.now()
+                })
+            }
+          })
         })
       handleJob({ appSdk, storeId }, queueEntry, job)
     })

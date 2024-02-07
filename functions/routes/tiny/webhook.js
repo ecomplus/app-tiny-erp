@@ -28,7 +28,7 @@ exports.post = ({ appSdk, admin }, req, res) => {
       const clientIp = req.get('x-forwarded-for') || req.connection.remoteAddress
       */
 
-      return sendMessageTopic('tiny', { tinyToken, storeId, body: req.body })
+      return sendMessageTopic('tiny', { tinyToken, storeId, body: req.body, flag: 'webhook' })
         .then(statusCode => {
           if (tipo === 'produto') {
             const mapeamentos = []
