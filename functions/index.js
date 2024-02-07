@@ -175,4 +175,10 @@ exports.checkExportedOrders = functions.runWith({ timeoutSeconds: 300 })
     return prepareAppSdk().then(appSdk => {
       checkExportedOrders({ appSdk })
     })
-  })
+})
+
+// update product variation
+const updateProduct = require('./lib/tiny/export-variation')
+const queueCreateProduct = 'every 10 mins'
+exports.onUpdateProduct = functions.pubsub.schedule(queueCreateProduct).onRun(updateProduct)
+console.log(`-- Sheduled active access from  '${queueCreateProduct}'`)
