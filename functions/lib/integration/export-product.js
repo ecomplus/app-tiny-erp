@@ -45,7 +45,7 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
               }]
             }
           }).then(async result => {
-            console.log(path, 'created or edited product on tiny', JSON.stringify(tinyProduct), JSON.stringify(product), JSON.stringify(originalTinyProduct))
+            console.log(path, 'created or edited product on tiny parsed:', tinyProduct && tinyProduct.codigo, product && product._id, JSON.stringify(originalTinyProduct))
             if (tinyProduct.variacoes && tinyProduct.variacoes.length && product) {
               const documentRef = require('firebase-admin')
                 .firestore()
