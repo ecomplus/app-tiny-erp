@@ -47,17 +47,20 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
           }).then(async result => {
             console.log(path, 'created or edited product on tiny parsed:', tinyProduct && tinyProduct.codigo, product && product._id, JSON.stringify(originalTinyProduct))
             if (tinyProduct.variacoes && tinyProduct.variacoes.length && product) {
+              console.log('inserir variacoes em lista')
               const documentRef = require('firebase-admin')
                 .firestore()
                 .doc(`variations/${storeId}`)
-                await documentRef.set({
-                  storeId,
-                  product,
-                  variations: tinyProduct.variacoes,
-                  originalTinyProduct,
-                  appData,
-                  queuedAt: admin.firestore.Timestamp.now()
-                })
+              await documentRef.set({
+                storeId,
+                product,
+                variations: tinyProduct.variacoes,
+                originalTinyProduct,
+                appData,
+                queuedAt: admin.firestore.Timestamp.now()
+              }).then(res => {
+                console.log('inserido com sucesso')
+              })
             }
           })
         })
