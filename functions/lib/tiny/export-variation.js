@@ -11,7 +11,7 @@ const getAppSdk = () => {
   })
 }
 
-const firestoreColl = 'variations'
+const firestoreColl = 'tiny_variations'
 module.exports = async () => {
   const appSdk = await getAppSdk(admin)
   let documentRef, storeId, product, variations, originalTinyProduct, appData
@@ -24,12 +24,13 @@ module.exports = async () => {
       .limit(1)
       .get()
     const info = documentSnapshot.docs && documentSnapshot.docs[0] && documentSnapshot.docs[0].data()
-    storeId = info.storeId
-    appData = info.appData
-    product = info.product
-    variations = info.variations
-    originalTinyProduct = info.originalTinyProduct
-    documentRef = require('firebase-admin')
+    if (info) {
+      storeId = info.storeId
+      appData = info.appData
+      product = info.product
+      variations = info.variations
+      originalTinyProduct = info.originalTinyProduct
+      documentRef = require('firebase-admin')
       .firestore()
       .doc(`${firestoreColl}/${storeId}`)
       return appSdk.getAuth(storeId)
@@ -76,5 +77,7 @@ module.exports = async () => {
       .then(() => {
         console.log('>> End Event exportation')
       })
+    }
+    
   }
 }
