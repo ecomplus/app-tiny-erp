@@ -54,6 +54,7 @@ module.exports = async () => {
                   }).then(async response => {
                     console.log(`Product ${products[i].codigo} sync successfully | #${storeId}`, response.data)
                     variations.splice(i, 1)
+                    console.log('interaction:', i, 'variations:', JSON.stringify(variations))
                     if (variations.length === 0) {
                       await docs[0].ref.delete()
                     } else {
