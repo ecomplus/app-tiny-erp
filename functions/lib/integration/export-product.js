@@ -17,7 +17,6 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
     .then(({ data }) => {
       const product = data
       const tiny = new Tiny(tinyToken)
-      const documentRef = firestore().doc(`tiny_variations/${storeId}`)
 
       const job = tiny.post('/produtos.pesquisa.php', { pesquisa: product.sku })
         .catch(err => {
@@ -48,6 +47,7 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
             }
           }).then(async result => {
             if (tinyProduct.variacoes && tinyProduct.variacoes.length && product) {
+              const documentRef = firestore().doc(`tiny_variations/${product.sku}`)
               const body = {
                 storeId,
                 product,

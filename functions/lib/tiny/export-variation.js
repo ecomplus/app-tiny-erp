@@ -24,7 +24,8 @@ module.exports = async () => {
       .orderBy('queuedAt')
       .limit(1)
       .get()
-    const info = documentSnapshot.docs && documentSnapshot.docs[0] && documentSnapshot.docs[0].data()
+    const { docs } = documentSnapshot
+    const info = docs && docs.length && docs[0] && docs[0].data()
     if (info) {
       storeId = info.storeId
       appData = info.appData
@@ -34,7 +35,7 @@ module.exports = async () => {
       const tiny = new Tiny(appData.tiny_api_token)
       documentRef = require('firebase-admin')
       .firestore()
-      .doc(`${firestoreColl}/${storeId}`)
+      .doc(`${firestoreColl}/${product.sku}`)
       return appSdk.getAuth(storeId)
       .then(async (auth) => {
           if (variations && variations.length) {
@@ -53,18 +54,23 @@ module.exports = async () => {
                   }).then(async response => {
                     console.log(`Product ${products[i].codigo} sync successfully | #${storeId}`, response.data)
                     variations.splice(i, 1)
-                    const body = {
-                      storeId,
-                      product,
-                      variations: tinyProduct.variacoes,
-                      appData,
-                      queuedAt: admin.firestore.Timestamp.now()
+                    if (variations.length === 0) {
+                      await docs[0].ref.delete()
+                    } else {
+                      const body = {
+                        storeId,
+                        product,
+                        variations,
+                        appData,
+                        queuedAt: admin.firestore.Timestamp.now()
+                      }
+                      if (originalTinyProduct) {
+                        body.originalTinyProduct = originalTinyProduct
+                      }
+                      await documentRef.set(body)
+  
+                      console.log(`#${storeId} saving in firestore list of products after create or update`, products.length) 
                     }
-                    if (originalTinyProduct) {
-                      body.originalTinyProduct = originalTinyProduct
-                    }
-                    await documentRef.set(body)
-                    console.log(`#${storeId} saving in firestore list of products after create or update`, products.length) 
                   })
               } catch (err) {
                   console.error(`Product ${products[i]._id} sync failed | #${storeId}`, err)
