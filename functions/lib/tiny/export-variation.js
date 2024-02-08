@@ -1,6 +1,7 @@
 const admin = require('firebase-admin')
 const { setup } = require('@ecomplus/application-sdk')
 const { getFirestore } = require('firebase-admin/firestore')
+const Tiny = require('./constructor')
 
 const parseVariation = require('../integration/parsers/product-to-tiny-variation')
 
@@ -30,6 +31,7 @@ module.exports = async () => {
       product = info.product
       variations = info.variations
       originalTinyProduct = info.originalTinyProduct
+      const tiny = new Tiny(appData.tiny_api_token)
       documentRef = require('firebase-admin')
       .firestore()
       .doc(`${firestoreColl}/${storeId}`)
