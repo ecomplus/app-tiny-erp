@@ -1,5 +1,6 @@
 const ecomClient = require('@ecomplus/client')
 const admin = require('firebase-admin')
+const { firestore } = require('firebase-admin')
 const errorHandling = require('../store-api/error-handling')
 const Tiny = require('../tiny/constructor')
 const parseProduct = require('./parsers/product-to-tiny')
@@ -7,7 +8,7 @@ const handleJob = require('./handle-job')
 
 module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreateNew) => {
   const productId = queueEntry.nextId
-  console.log('product to export')
+
   return ecomClient.store({
     storeId,
     url: `/products/${productId}.json`
@@ -16,6 +17,7 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
     .then(({ data }) => {
       const product = data
       const tiny = new Tiny(tinyToken)
+      const documentRef = firestore().doc(`tiny_variations/${storeId}`)
 
       const job = tiny.post('/produtos.pesquisa.php', { pesquisa: product.sku })
         .catch(err => {
@@ -48,19 +50,18 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
             console.log(path, 'created or edited product on tiny parsed:', tinyProduct && tinyProduct.codigo, product && product._id, JSON.stringify(originalTinyProduct))
             if (tinyProduct.variacoes && tinyProduct.variacoes.length && product) {
               console.log('inserir variacoes em lista')
-              const documentRef = require('firebase-admin')
-                .firestore()
-                .doc(`variations/${storeId}`)
-              await documentRef.set({
-                storeId,
-                product,
-                variations: tinyProduct.variacoes,
-                originalTinyProduct,
-                appData,
-                queuedAt: admin.firestore.Timestamp.now()
-              }).then(res => {
-                console.log('inserido com sucesso')
-              })
+              try {
+                await documentRef.set({
+                  storeId,
+                  product,
+                  variations: tinyProduct.variacoes,
+                  originalTinyProduct,
+                  appData,
+                  queuedAt: admin.firestore.Timestamp.now()
+                })
+              } catch (error) {
+                console.log('não inseriu no firestore', error) 
+              }
             }
           })
         })
