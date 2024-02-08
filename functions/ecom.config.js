@@ -214,7 +214,7 @@ const app = {
         type: 'boolean',
         default: false,
         title: 'Importar todos produtos',
-        description: 'Importar o produto após qualquer alteração do mesmo no tiny'
+        description: 'Importar produto ao enviar pelo tiny'
       },
       hide: true
     },
