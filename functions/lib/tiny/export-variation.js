@@ -53,14 +53,17 @@ module.exports = async () => {
                   }).then(async response => {
                     console.log(`Product ${products[i].codigo} sync successfully | #${storeId}`, response.data)
                     variations.splice(i, 1)
-                    await documentRef.set({
+                    const body = {
                       storeId,
                       product,
-                      variations,
-                      originalTinyProduct,
+                      variations: tinyProduct.variacoes,
                       appData,
                       queuedAt: admin.firestore.Timestamp.now()
-                    })
+                    }
+                    if (originalTinyProduct) {
+                      body.originalTinyProduct = originalTinyProduct
+                    }
+                    await documentRef.set(body)
                     console.log(`#${storeId} saving in firestore list of products after create or update`, products.length) 
                   })
               } catch (err) {
