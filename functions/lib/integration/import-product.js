@@ -132,7 +132,10 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           } 
           const tiny = new Tiny(tinyToken)
 
-          const handleTinyStock = ({ produto, tipo }, tinyProduct) => {         
+          const handleTinyStock = ({ produto, tipo }, tinyProduct) => {
+            if (storeId == 51305) {
+              console.log('product importation', JSON.stringify(produto), tipo)
+            }         
             let quantity = Number(produto.saldo)
             if (!quantity & quantity !== 0) {
               quantity = Number(produto.estoqueAtual)
