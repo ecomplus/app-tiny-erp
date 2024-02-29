@@ -174,7 +174,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 if (productId) {
                   method = 'PATCH'
                   endpoint = `/products/${productId}.json`
-                } else if (tipo === 'produto' || appData.import_all_products) {
+                } else if (tipo === 'produto') {
                   method = 'POST'
                   endpoint = '/products.json'
                 } else {

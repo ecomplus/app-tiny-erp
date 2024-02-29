@@ -209,15 +209,6 @@ const app = {
       },
       hide: true
     },
-    import_all_products: {
-      schema: {
-        type: 'boolean',
-        default: false,
-        title: 'Importar todos produtos',
-        description: 'Importar produto ao enviar pelo tiny'
-      },
-      hide: true
-    },
     update_price: {
       schema: {
         type: 'boolean',
