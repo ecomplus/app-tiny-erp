@@ -7,8 +7,7 @@ module.exports = (tinyOrder, shippingLines, tiny) => new Promise((resolve, rejec
   if (shippingLines && shippingLines.length) {
     const shippingLine = shippingLines[0]
     if (
-      (tinyOrder.codigo_rastreamento || tinyOrder.url_rastreamento) &&
-      (!shippingLine.tracking_codes || !shippingLine.tracking_codes.length)
+      (tinyOrder.codigo_rastreamento || tinyOrder.url_rastreamento)
     ) {
       let link
       if (tinyOrder.url_rastreamento) {
