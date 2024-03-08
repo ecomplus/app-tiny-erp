@@ -39,9 +39,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           let listEndpoint = '/orders.json?limit=1&fields=_id,payments_history,fulfillments,shipping_lines'
           if (orderNumber) {
             listEndpoint += `&number=${orderNumber}`
-          } else {
+          } /* else {
             listEndpoint += `&metafields.field=tiny:id&metafields.value=${tinyOrderId}`
-          }
+          } */
           return appSdk.apiRequest(storeId, listEndpoint, 'GET', null, auth)
 
             .then(({ response }) => {
