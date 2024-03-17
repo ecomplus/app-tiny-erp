@@ -45,13 +45,15 @@ module.exports = async () => {
                   console.log('Sending:', products.length, 'index:', i)
                   const parsedVariation = parseVariation(product, products[i], originalTinyProduct, appData, storeId)
                   await new Promise((resolve) => setTimeout(resolve, 1000))
-                  tiny.post('/produto.alterar.php', {
+                  const bodyTiny = {
                     produto: {
                       produtos: [{
                         produto: parsedVariation
                       }]
                     }
-                  }).then(async response => {
+                  }
+                  console.log('Body variation', JSON.stringify(bodyTiny))
+                  tiny.post('/produto.alterar.php', bodyTiny).then(async response => {
                     console.log(`Product ${products[i].codigo} sync successfully | #${storeId}`, response.data)
                     variations.splice(i, 1)
                     console.log('interaction:', i, 'variations:', JSON.stringify(variations))

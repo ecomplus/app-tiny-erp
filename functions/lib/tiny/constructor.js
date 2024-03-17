@@ -26,7 +26,7 @@ module.exports = function (token) {
     })
       .then(response => {
         const { retorno } = response.data
-        console.log('>> Debug Retorno =>  ', retorno, ' <<')
+        console.log('>> Debug Retorno =>  ', retorno, retorno.registros, ' <<')
         if (retorno.status === 'Erro') {
           const err = new Error('Tiny error response')
           const tinyErrorCode = parseInt(retorno.codigo_erro, 10)
