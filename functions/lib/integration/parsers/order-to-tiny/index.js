@@ -33,6 +33,8 @@ module.exports = (order, appData, storeId) => {
         tinyObject[tinyField] = String(address[addressField]).substring(0, maxLength).replaceAll('&', 'e')
       } else if (tinyField === 'numero' && appData.non_number) {
         tinyObject['numero'] = '0'
+      } else if (tinyField === 'numero' && !appData.non_number) {
+        tinyObject['numero'] = 'S/N'
       }
     })
   }
