@@ -59,7 +59,12 @@ module.exports = (order, appData, storeId) => {
       tinyCustomer.email = buyer.main_email
     }
     if (shippingAddress) {
-      parseAddress(billingAddress || shippingAddress, tinyCustomer, appData)
+      if (storeId == 4566) {
+        parseAddress(shippingAddress || billingAddress, tinyCustomer, appData)
+      } else {
+        parseAddress(billingAddress || shippingAddress, tinyCustomer, appData)
+      }
+      
     }
     const phone = buyer.phones && buyer.phones[0]
     if (phone) {
@@ -74,7 +79,10 @@ module.exports = (order, appData, storeId) => {
   }
 
   if (shippingAddress) {
-    tinyOrder.endereco_entrega = {}
+    tinyOrder.endereco_entrega = {
+      cpf_cnpj: buyer.doc_number,
+      tipo_pessoa: buyer.registry_type === 'j' ? 'J' : 'F'
+    }
     parseAddress(shippingAddress, tinyOrder.endereco_entrega, appData)
     if (shippingAddress.name) {
       tinyOrder.endereco_entrega.nome_destinatario = shippingAddress.name.substring(0, 60).replaceAll('&', 'e')
