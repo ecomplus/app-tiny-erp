@@ -99,12 +99,17 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 if (!metafields) {
                   metafields = []
                 }
-                metafields.push({
-                  _id: ecomUtils.randomObjectId(),
-                  namespace: 'tiny',
-                  field: 'tiny:id',
-                  value: String(idTiny)
-                })
+                const tinyIdIndex = metafields.findIndex(({field}) => field === 'tiny:id')
+                if (tinyIdIndex > -1) {
+                  metafields[tinyIdIndex].value = String(idTiny)
+                } else {
+                  metafields.push({
+                    _id: ecomUtils.randomObjectId(),
+                    namespace: 'tiny',
+                    field: 'tiny:id',
+                    value: String(idTiny)
+                  })
+                }
                 if (appData.tiny_order_data && appData.tiny_order_data.id_ecommerce) {
                   metafields.push({
                     _id: ecomUtils.randomObjectId(),
