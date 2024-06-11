@@ -132,10 +132,18 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           } 
           const tiny = new Tiny(tinyToken)
 
-          const handleTinyStock = ({ produto, tipo }, tinyProduct) => {
+          const handleTinyStock = ({ produto, tipo, preco, precoPromocional }, tinyProduct) => {
             if (storeId == 51305) {
               console.log('product importation', JSON.stringify(produto), tipo)
-            }         
+            }
+            let price, basePrice
+            if (precoPromocional > 0) {
+              price = precoPromocional
+              basePrice = preco
+            } else if (preco > 0) {
+              price = preco
+              basePrice = preco
+            }      
             let quantity = Number(produto.saldo)
             if (!quantity & quantity !== 0) {
               quantity = Number(produto.estoqueAtual)
@@ -143,7 +151,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             if (produto.saldoReservado) {
               quantity -= Number(produto.saldoReservado)
             }
-            if (product && (!appData.update_product || variationId)) {
+            if (product && (!appData.update_product || variationId || (tipo === 'precos'))) {
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
                   quantity = 0
@@ -155,6 +163,14 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 endpoint += '/quantity.json'
                 console.log(`#${storeId} ${endpoint}`, { quantity })
                 return appSdk.apiRequest(storeId, endpoint, 'PUT', { quantity }, auth)
+              } else if (!isNaN(price)) {
+                let endpoint = `/products/${product._id}`
+                if (variationId) {
+                  endpoint += `/variations/${variationId}`
+                }
+                endpoint += '/price.json'
+                console.log(`#${storeId} ${endpoint}`, { price })
+                return appSdk.apiRequest(storeId, endpoint, 'PUT', { price, base_price: basePrice }, auth)
               }
               return null
             } else if (!product && tinyProduct && tipo === 'produto') {
