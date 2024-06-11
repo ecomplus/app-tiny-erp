@@ -63,8 +63,8 @@ module.exports = async (
             }
           }
 
-          if (tipo === 'produto' || tipo === 'estoque') {
-            if ((dados.id || dados.idProduto) && (dados.codigo || dados.sku)) {
+          if (tipo === 'produto' || tipo === 'estoque' || (tipo === 'precos')) {
+            if ((dados.id || dados.idProduto || dados.idMapeamento) && (dados.codigo || dados.sku)) {
               return new Promise((resolve, reject) => {
                 const nextId = String(dados.skuMapeamento || dados.sku || dados.codigo)
                 const tinyStockUpdate = {
@@ -72,8 +72,8 @@ module.exports = async (
                   ref: `${storeId}_${tinyToken}_${nextId}`,
                   tipo,
                   produto: {
-                    id: dados.idProduto,
-                    codigo: dados.sku,
+                    id: dados.idProduto || dados.idMapeamento,
+                    codigo: dados.sku || dados.codigo,
                     ...dados
                   },
                   updatedAt: admin.firestore.Timestamp.fromDate(new Date())
