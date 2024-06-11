@@ -30,7 +30,7 @@ exports.post = ({ appSdk, admin }, req, res) => {
 
       return sendMessageTopic('tiny', { tinyToken, storeId, body: req.body, flag: 'webhook' })
         .then(statusCode => {
-          if (tipo === 'produto') {
+          if (tipo === 'produto' || (tipo === 'precos')) {
             const mapeamentos = []
             const parseTinyItem = tinyItem => {
               if (tinyItem) {
