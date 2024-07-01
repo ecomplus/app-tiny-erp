@@ -245,6 +245,15 @@ const app = {
       },
       hide: true
     },
+    enable_category_import: {
+      schema: {
+        type: 'boolean',
+        default: false,
+        title: 'Habilitar importação de categorias',
+        description: 'Habilita importação de categorias sempre que um produto novo é criado no Tiny'
+      },
+      hide: true
+    },
     exportation: {
       schema: {
         title: 'Exportação manual',
@@ -361,7 +370,7 @@ const app = {
             ecom_status: {
               type: 'string',
               enum: [
-                'Pendente', 
+                'Pendente',
                 'Em análise',
                 'Autorizado',
                 'Pago',
@@ -377,14 +386,14 @@ const app = {
                 'Aguardando troca',
                 'Devolvido',
                 'Retorno e troca',
-                'Não alterar status' 
+                'Não alterar status'
               ],
               title: 'Status E-Com Plus'
             },
             tiny_status: {
               type: 'string',
               enum: [
-                'Em aberto', 
+                'Em aberto',
                 'Aprovado',
                 'Preparando envio',
                 'Faturado',
