@@ -78,7 +78,7 @@ module.exports = async (
                   },
                   updatedAt: admin.firestore.Timestamp.fromDate(new Date())
                 }
-                console.log(`> Tiny webhook: #${storeId} ${nextId} => ${tinyStockUpdate.produto.saldo} - ${tinyStockUpdate.produto.estoqueAtual}` )
+                console.log(`> Tiny webhook: #${storeId} ${nextId} => ${tinyStockUpdate.produto.saldo} - ${tinyStockUpdate.produto.estoqueAtual}`)
 
                 const queueEntry = {
                   nextId,
@@ -109,5 +109,4 @@ module.exports = async (
         }
       })
   }
-  
 }
