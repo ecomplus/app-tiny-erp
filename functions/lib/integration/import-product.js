@@ -179,7 +179,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth).then(async (response) => {
                   if (appData.enable_category_import) {
                     const { response: { data: { _id: newProductId } } } = response
-                    const { arvoreCategoria } = tinyStockUpdate
+                    const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
                     if (arvoreCategoria && newProductId) {
                       await importCategoriesFromTiny({ appSdk, storeId, auth }, newProductId, arvoreCategoria)
                     }

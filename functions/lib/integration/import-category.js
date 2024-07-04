@@ -13,10 +13,10 @@ const getCategoriesAll = async ({ appSdk, storeId, auth }) => {
   let hasRepeat = true
   let offset = 0
   const limit = 1000
-  const categoriesAll = []
+  const getCategoriesAll = []
 
   while (hasRepeat) {
-    const query = `fields=name,slug,_id,parent&offset=${offset}&limit=${limit}`
+    const query = `fields=name,slug,_id,parent,metafields&offset=${offset}&limit=${limit}`
     const categories = await appSdk.apiRequest(storeId, `/categories.json?${query}`, 'GET', null, auth)
       .then(({ response }) => {
         const { data: { result } } = response
@@ -30,28 +30,27 @@ const getCategoriesAll = async ({ appSdk, storeId, auth }) => {
         return null
       })
 
-    if (categories && Array.isArray(categories)) {
-      categoriesAll.push(...categories)
+    if (Array.isArray(categories)) {
+      getCategoriesAll.push(...categories)
     } else {
       hasRepeat = false
     }
 
     offset += limit
   }
-  return categoriesAll
+  return getCategoriesAll
 }
 
 module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) => {
-  const categoriesAll = await getCategoriesAll({ appSdk, storeId, auth })
-  if (categoriesAll.length) {
-    const promises = []
-    const categoriesToProduct = []
+  const allStoreCategories = await getCategoriesAll({ appSdk, storeId, auth })
+  if (allStoreCategories.length) {
+    const categories = []
     let i = 0
     while (i < tinyCategories.length) {
       const tinyCategory = tinyCategories[i]
       i += 1
       const { id, descricao, idPai } = tinyCategory
-      const category = categoriesAll.find(({ name }) => name.toUpperCase() === descricao.toUpperCase())
+      const category = allStoreCategories.find(({ name }) => name.toUpperCase() === descricao.toUpperCase())
       if (!category) {
         const body = {
           name: descricao[0].toUpperCase() + descricao.substring(1),
@@ -67,12 +66,11 @@ module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) =>
         }]
 
         if (idPai) {
-          const endpoint = `/categories.json?metafields.namespace=tiny&metafields.field=idCategoria&metafields.value=${idPai}&limit=1`
-          const categoriaPai = await appSdk.apiRequest(storeId, endpoint, 'GET', null, auth)
-            .then(({ response }) => {
-              const { data: { result } } = response
-              return result.length && result[0]
-            })
+          const categoriaPai = allStoreCategories.find(
+            ({ metafields }) => metafields?.find(
+              ({ namespace, field, value }) => namespace === 'tiny' && field === 'idCategoria' && value === `${idPai}`
+            )
+          )
 
           if (categoriaPai) {
             body.parent = {
@@ -90,17 +88,19 @@ module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) =>
           })
           .catch(e => null)
         if (newCategory) {
-          categoriesToProduct.push(newCategory)
+          // next interation new category exists in store
+          allStoreCategories.push(newCategory)
+
+          delete newCategory.metafields
+          categories.push(newCategory)
         }
       } else {
-        categoriesToProduct.push(category)
+        delete categories.metafields
+        categories.push(category)
       }
     }
-    categoriesToProduct.forEach(category => {
-      promises.push(
-        appSdk.apiRequest(storeId, `/products/${productId}/categories.json`, 'POST', { _id: category._id }, auth)
-      )
-    })
-    await Promise.all(promises)
+
+    await appSdk.apiRequest(storeId, `/products/${productId}.json`, 'PATCH', { categories }, auth)
+      .catch(console.error)
   }
 }
