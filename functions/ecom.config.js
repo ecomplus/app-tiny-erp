@@ -250,7 +250,7 @@ const app = {
         type: 'boolean',
         default: false,
         title: 'Habilitar importação de categorias',
-        description: 'Habilita importação de categorias sempre que um produto novo é criado no Tiny'
+        description: 'Habilita importação de categorias ao importar produtos do Tiny'
       },
       hide: true
     },

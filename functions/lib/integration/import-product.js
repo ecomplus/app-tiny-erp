@@ -6,6 +6,7 @@ const Tiny = require('../tiny/constructor')
 const parseProduct = require('./parsers/product-to-ecomplus')
 const handleJob = require('./handle-job')
 const importCategoriesFromTiny = require('./import-category')
+const { response } = require('express')
 
 module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, canCreateNew, isHiddenQueue) => {
   const [sku, productId] = String(queueEntry.nextId).split(';:')
@@ -177,11 +178,12 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             } else if (!product && tinyProduct && tipo === 'produto') {
               return parseProduct(tinyProduct, storeId, auth, true, tipo).then(product => {
                 return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth).then(async (response) => {
-                  if (appData.enable_category_import) {
+                  if (appData.enable_category_import && tinyStockUpdate?.produto?.arvoreCategoria) {
                     const { response: { data: { _id: newProductId } } } = response
-                    const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
+                    const { arvoreCategoria } = tinyStockUpdate?.produto
                     if (arvoreCategoria && newProductId) {
                       await importCategoriesFromTiny({ appSdk, storeId, auth }, newProductId, arvoreCategoria)
+                        .catch(console.error)
                     }
                   }
                   console.log('Produto criado com sucesso')
@@ -212,7 +214,21 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     product.quantity = quantity >= 0 ? quantity : 0
                   }
                   console.log(`#${storeId} ${method} ${endpoint} ${product.sku} ${product.price} ${product.quantity}`)
+
                   const promise = appSdk.apiRequest(storeId, endpoint, method, product, auth)
+                    .then(async (response) => {
+                      if (appData.enable_category_import && tinyStockUpdate?.produto?.arvoreCategoria) {
+                        if (!productId) {
+                          productId = response?.response?.data && response?.response?.data._id
+                        }
+                        const { arvoreCategoria } = tinyStockUpdate?.produto
+                        if (arvoreCategoria && productId) {
+                          await importCategoriesFromTiny({ appSdk, storeId, auth }, productId, arvoreCategoria)
+                            .catch(console.error)
+                        }
+                      }
+                      return response
+                    })
 
                   if (Array.isArray(produto.variacoes) && produto.variacoes.length) {
                     promise.then(({ response }) => {

@@ -30,7 +30,8 @@ const getCategoriesAll = async ({ appSdk, storeId, auth }) => {
         return null
       })
 
-    if (Array.isArray(categories)) {
+    if (categories && categories.length) {
+      hasRepeat = categories.length === limit
       getCategoriesAll.push(...categories)
     } else {
       hasRepeat = false
@@ -53,7 +54,7 @@ module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) =>
       const category = allStoreCategories.find(({ name }) => name.toUpperCase() === descricao.toUpperCase())
       if (!category) {
         const body = {
-          name: descricao[0].toUpperCase() + descricao.substring(1),
+          name: descricao,
           slug: removeAccents(descricao.toLowerCase())
             .replace(/[^a-z0-9-_./]/gi, '-')
         }
@@ -91,12 +92,12 @@ module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) =>
           // next interation new category exists in store
           allStoreCategories.push(newCategory)
 
-          delete newCategory.metafields
-          categories.push(newCategory)
+          const { _id, name, slug } = newCategory
+          categories.push({ _id, name, slug })
         }
       } else {
-        delete categories.metafields
-        categories.push(category)
+        const { _id, name, slug } = category
+        categories.push({ _id, name, slug })
       }
     }
 
