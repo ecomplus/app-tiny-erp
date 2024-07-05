@@ -26,9 +26,7 @@ const getCategoriesAll = async ({ appSdk, storeId, auth }) => {
           return null
         }
       })
-      .catch((_err) => {
-        return null
-      })
+      .catch(console.error)
 
     if (categories && categories.length) {
       hasRepeat = categories.length === limit
@@ -87,10 +85,7 @@ module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) =>
             const { data: { _id } } = response
             return { _id, ...body }
           })
-          .catch(e => {
-            console.error(e)
-            return null
-          })
+          .catch(console.error)
         if (newCategory) {
           // next interation new category exists in store
           allStoreCategories.push(newCategory)
