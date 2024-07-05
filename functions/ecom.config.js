@@ -249,8 +249,8 @@ const app = {
       schema: {
         type: 'boolean',
         default: false,
-        title: 'Habilitar importação de categorias',
-        description: 'Habilita importação de categorias ao importar produtos do Tiny'
+        title: 'Importar categorias',
+        description: 'Habilita importação de categorias em produtos enviados do Tiny'
       },
       hide: true
     },

@@ -87,7 +87,10 @@ module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) =>
             const { data: { _id } } = response
             return { _id, ...body }
           })
-          .catch(e => null)
+          .catch(e => {
+            console.error(e)
+            return null
+          })
         if (newCategory) {
           // next interation new category exists in store
           allStoreCategories.push(newCategory)

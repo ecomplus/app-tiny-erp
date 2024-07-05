@@ -6,7 +6,6 @@ const Tiny = require('../tiny/constructor')
 const parseProduct = require('./parsers/product-to-ecomplus')
 const handleJob = require('./handle-job')
 const importCategoriesFromTiny = require('./import-category')
-const { response } = require('express')
 
 module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, canCreateNew, isHiddenQueue) => {
   const [sku, productId] = String(queueEntry.nextId).split(';:')
@@ -180,8 +179,8 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth).then(async (response) => {
                   if (appData.enable_category_import && tinyStockUpdate?.produto?.arvoreCategoria) {
                     const { response: { data: { _id: newProductId } } } = response
-                    const { arvoreCategoria } = tinyStockUpdate?.produto
-                    if (arvoreCategoria && newProductId) {
+                    const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
+                    if (newProductId) {
                       await importCategoriesFromTiny({ appSdk, storeId, auth }, newProductId, arvoreCategoria)
                         .catch(console.error)
                     }
@@ -219,10 +218,10 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     .then(async (response) => {
                       if (appData.enable_category_import && tinyStockUpdate?.produto?.arvoreCategoria) {
                         if (!productId) {
-                          productId = response?.response?.data && response?.response?.data._id
+                          productId = response.response?.data?._id
                         }
-                        const { arvoreCategoria } = tinyStockUpdate?.produto
-                        if (arvoreCategoria && productId) {
+                        const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
+                        if (productId) {
                           await importCategoriesFromTiny({ appSdk, storeId, auth }, productId, arvoreCategoria)
                             .catch(console.error)
                         }
