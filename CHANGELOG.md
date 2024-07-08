@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.0](https://github.com/ecomplus/application-starter/compare/v3.3.0...v3.4.0) (2024-07-08)
+
+
+### Features
+
+* cron to check exported orders and enqueue if needed ([20f1344](https://github.com/ecomplus/application-starter/commit/20f134464290aa82ea35ca80f579a46fcff133c7))
+* **ecom-config:** mapping status ([d8f66d5](https://github.com/ecomplus/application-starter/commit/d8f66d50e209eab5ad91274304269e24895b1fcd))
+* **ecom-config:** option to enable update for only financial status ([23b3bbd](https://github.com/ecomplus/application-starter/commit/23b3bbd9203d80bbb9a4b8cdcf648554a7ee209c))
+* **ecom-config:** set procedure to get shipping line to modification ([136e98b](https://github.com/ecomplus/application-starter/commit/136e98babe20a28c17227650bfdae29c31448185))
+* **parse-status:** parse status with mapping ([9c29f3e](https://github.com/ecomplus/application-starter/commit/9c29f3eff8447833884cd7de336bee591569b008))
+
+
+### Bug Fixes
+
+* **deps:** update dependency @google-cloud/firestore to v6 ([#119](https://github.com/ecomplus/application-starter/issues/119)) ([01d59db](https://github.com/ecomplus/application-starter/commit/01d59db6cd383fc0eadc4fbb8453b652c938ba67))
+* **deps:** update dependency @google-cloud/pubsub to v4 ([#145](https://github.com/ecomplus/application-starter/issues/145)) ([19c3303](https://github.com/ecomplus/application-starter/commit/19c3303d186bb29a9e5fa80d75e350c24dfde43a))
+* **deps:** update dependency firebase-functions to v4 ([#134](https://github.com/ecomplus/application-starter/issues/134)) ([0c5ff45](https://github.com/ecomplus/application-starter/commit/0c5ff45987a6bf055ff8b0e9993d0fe36b45df2a))
+* **import-categories:** add error debugging in requests ([349d4d9](https://github.com/ecomplus/application-starter/commit/349d4d928e6584d2dc14c744710cf28ee25e7254))
+* **import-categories:** change configuration description and fix checks for importing categories ([ea84873](https://github.com/ecomplus/application-starter/commit/ea8487327df3e59e6f5c20add198fb9ff5885694))
+* **import-categories:** change configuration description and run category import on product updates ([ab14772](https://github.com/ecomplus/application-starter/commit/ab14772d36d1bd9de9461c14176744b42a39ed49))
+* **import-categories:** improves requests to search, create and add categories to the product ([2191f46](https://github.com/ecomplus/application-starter/commit/2191f46c25147134ef9bdee746a1a0db67bbb664))
+* **import-products:** syntax error from importation ([0e0f3ed](https://github.com/ecomplus/application-starter/commit/0e0f3ed578f0076187b158d9b9171019fad2b34b))
+* listing less orders on check exports cron filtering any _from-tiny_ fulfillment ([e79ab98](https://github.com/ecomplus/application-starter/commit/e79ab9853cfa0ae51201225454b9c460af96f26e))
+* **product-to-ecomplus:** handle properly variation ([52acd39](https://github.com/ecomplus/application-starter/commit/52acd397e4e69084913de3aad16b240fa168541e))
+* properly adding order ids (string) to queue on exported orders check ([9184150](https://github.com/ecomplus/application-starter/commit/9184150f8fed53c6a556debf512038085285fb61))
+* properly checking already exported orders by id on cron check ([6d9535a](https://github.com/ecomplus/application-starter/commit/6d9535af17a3747f2801bc745a43b7e7bc292896))
+* properly checking already exported orders by id on cron check ([04f8a19](https://github.com/ecomplus/application-starter/commit/04f8a1914def926dc6b3126cd13ab4d348095360))
+
 ## [3.3.0](https://github.com/ecomplus/application-starter/compare/v3.2.1...v3.3.0) (2023-07-27)
 
 
