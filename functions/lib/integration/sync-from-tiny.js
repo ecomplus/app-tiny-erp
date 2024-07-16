@@ -8,8 +8,7 @@ const formatDate = require('./helpers/format-tiny-date')
 const listStoreIds = () => {
   const storeIds = []
   const date = new Date()
-  date.setHours(date.getHours() - 24)
-
+  date.setHours(date.getHours() - 48)
   return firestore()
     .collection('ecomplus_app_auth')
     .where('updated_at', '>', firestore.Timestamp.fromDate(date))
