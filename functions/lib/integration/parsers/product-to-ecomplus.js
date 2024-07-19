@@ -112,7 +112,9 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
         product.meta_description = tinyProduct.seo.description.slice(0, 999)
       }
       if (tinyProduct.seo.keywords && tinyProduct.seo.keywords.length) {
-        product.keywords = tinyProduct.seo.keywords.split(',')
+        const splitChar = tinyProduct.seo.keywords.includes(',') ? ',' : '-'
+        const keywords = tinyProduct.seo.keywords.split(splitChar)
+        product.keywords = keywords.slice(0, 99).map((keyword) => keyword.substring(0, 50))
       }
     }
     if (!product.slug) {
