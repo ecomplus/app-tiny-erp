@@ -41,8 +41,9 @@ const getCategoriesAll = async ({ appSdk, storeId, auth }) => {
 }
 
 module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) => {
+  console.log(`# product: #${productId} tinyCategories: ${tinyCategories && JSON.stringify(tinyCategories)}`)
   const allStoreCategories = await getCategoriesAll({ appSdk, storeId, auth })
-  if (allStoreCategories.length) {
+  if (allStoreCategories.length && tinyCategories) {
     const categories = []
     let i = 0
     while (i < tinyCategories.length) {
