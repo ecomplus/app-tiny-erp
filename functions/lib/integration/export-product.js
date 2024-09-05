@@ -5,6 +5,7 @@ const errorHandling = require('../store-api/error-handling')
 const Tiny = require('../tiny/constructor')
 const parseProduct = require('./parsers/product-to-tiny')
 const handleJob = require('./handle-job')
+const { logger } = require('../../context')
 
 module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreateNew) => {
   const productId = queueEntry.nextId
@@ -61,7 +62,8 @@ module.exports = ({ appSdk, storeId }, tinyToken, queueEntry, appData, canCreate
               try {
                 await documentRef.set(body)
               } catch (error) {
-                console.log('não inseriu no firestore', error) 
+                logger.warn('não inseriu no firestore')
+                logger.error(error)
               }
             }
           })

@@ -6,6 +6,7 @@ const path = require('path')
 const recursiveReadDir = require('./lib/recursive-read-dir')
 
 const handleEventTiny = require('./lib/pubsub/webhook-tiny')
+const { createExecContext } = require('./context')
 
 // Firebase SDKs to setup cloud functions and access Firestore database
 const admin = require('firebase-admin')
@@ -140,8 +141,8 @@ recursiveReadDir(routesDir).filter(filepath => filepath.endsWith('.js')).forEach
 server.use(router)
 server.use(express.static('public'))
 
-exports[functionName] = functions.https.onRequest(server)
-exports[`${functionName}v2`] = onRequest({ memory: '512MiB' }, server)
+exports[functionName] = functions.https.onRequest(createExecContext(server))
+exports[`${functionName}v2`] = onRequest({ memory: '512MiB' }, createExecContext(server))
 console.log(`-- Starting '${app.title}' E-Com Plus app with Function '${functionName}'`)
 
 // schedule update tokens job
@@ -167,7 +168,7 @@ exports.scheduledClear = functions.runWith({ timeoutSeconds: 300 })
 console.log(`-- Sheduled clearing Tiny stored states '${clearStatesCron}'`)
 
 exports.onTinyEvents = require('./lib/pubsub/create-topic')
-  .createEventsFunction('tiny', handleEventTiny)
+  .createEventsFunction('tiny', createExecContext(handleEventTiny))
 
 const checkExportedOrders = require('./lib/integration/check-exported-orders')
 exports.checkExportedOrders = functions.runWith({ timeoutSeconds: 300 })
@@ -175,7 +176,7 @@ exports.checkExportedOrders = functions.runWith({ timeoutSeconds: 300 })
     return prepareAppSdk().then(appSdk => {
       checkExportedOrders({ appSdk })
     })
-})
+  })
 
 // update product variation
 const updateProduct = require('./lib/tiny/export-variation')

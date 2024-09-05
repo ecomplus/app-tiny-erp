@@ -1,5 +1,6 @@
 const getAppData = require('./../../lib/store-api/get-app-data')
 const updateAppData = require('../store-api/update-app-data')
+const { logger } = require('../../context')
 
 const queueRetry = (appSession, { action, queue, nextId }, appData, response) => {
   const retryKey = `${appSession.storeId}_${action}_${queue}_${nextId}`
@@ -11,9 +12,9 @@ const queueRetry = (appSession, { action, queue, nextId }, appData, response) =>
     .then(documentSnapshot => {
       if (documentSnapshot.exists) {
         if (Date.now() - documentSnapshot.updateTime.toDate().getTime() > 5 * 60 * 1000) {
-          documentRef.delete().catch(console.error)
+          documentRef.delete().catch(logger.error)
         } else {
-          console.log(`> Skip retry: ${retryKey}`)
+          logger.info(`> Skip retry: ${retryKey}`)
           return null
         }
       }
@@ -115,7 +116,7 @@ const log = ({ appSdk, storeId }, queueEntry, payload) => {
                     [queue]: queueList
                   }
                 }
-                console.log(`#${storeId} ${JSON.stringify(data)}`)
+                logger.info(`#${storeId} ${JSON.stringify(data)}`)
                 updateAppData({ appSdk, storeId, auth }, data).catch(err => {
                   if (err.response && (!err.response.status || err.response.status >= 500)) {
                     queueRetry({ appSdk, storeId, auth }, queueEntry, appData, err.response)
@@ -153,13 +154,13 @@ const log = ({ appSdk, storeId }, queueEntry, payload) => {
                       [queueEntry.key]: false
                     }, {
                       merge: true
-                    }).catch(console.error)
+                    }).catch(logger.error)
                   }, queueEntry.mustUpdateAppQueue ? 900 : 400)
                 }
               })
               .then(checkUpdateQueue)
               .catch(err => {
-                console.error(err)
+                logger.error(err)
                 checkUpdateQueue()
               })
           } else {
@@ -174,7 +175,7 @@ const log = ({ appSdk, storeId }, queueEntry, payload) => {
           }
         })
     })
-    .catch(console.error)
+    .catch(logger.error)
 }
 
 const handleJob = (appSession, queueEntry, job) => {
@@ -199,7 +200,7 @@ const handleJob = (appSession, queueEntry, job) => {
         }
       })
   } else {
-    console.log(`< Queue entry ${JSON.stringify(queueEntry)} with no job to handle`)
+    logger.info(`< Queue entry ${JSON.stringify(queueEntry)} with no job to handle`)
   }
 }
 

@@ -1,3 +1,4 @@
+const { logger } = require('../../context')
 const PubSub = require('@google-cloud/pubsub').PubSub
 const getPubSubTopic = require('../../lib/pubsub/create-topic').getPubSubTopic
 
@@ -7,7 +8,7 @@ const sendMessageTopic = async (eventName, json) => {
     .topic(topicName)
     .publishMessage({ json })
 
-  console.log('>> MessageId: ', messageId, ' Topic: ', topicName)
+  logger.info(`>> MessageId: ${messageId} Topic: ${topicName}`)
 
   return Promise.resolve(200)
 }
@@ -55,7 +56,7 @@ exports.post = ({ appSdk, admin }, req, res) => {
         .catch(err => {
           err.storeId = storeId
           err.tinyToken = tinyToken
-          console.error(err)
+          logger.error(err)
           res.sendStatus(502)
         })
     } else {

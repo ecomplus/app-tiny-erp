@@ -11,7 +11,7 @@ module.exports = async ({ appSdk }) => {
   const endpoint = '/orders.json' +
     '?financial_status.current=paid' +
     `&financial_status.updated_at>=${d.toISOString()}` +
-    `&fulfillments.flags!=from-tiny` +
+    '&fulfillments.flags!=from-tiny' +
     `&updated_at<=${(new Date(Date.now() - 1000 * 60 * 5).toISOString())}` +
     '&fields=_id,number' +
     '&sort=created_at'

@@ -32,9 +32,9 @@ module.exports = (order, appData, storeId) => {
       if (address[addressField]) {
         tinyObject[tinyField] = String(address[addressField]).substring(0, maxLength).replaceAll('&', 'e')
       } else if (tinyField === 'numero' && appData.non_number) {
-        tinyObject['numero'] = '0'
+        tinyObject.numero = '0'
       } else if (tinyField === 'numero' && !appData.non_number) {
-        tinyObject['numero'] = 'S/N'
+        tinyObject.numero = 'S/N'
       }
     })
   }
@@ -59,12 +59,11 @@ module.exports = (order, appData, storeId) => {
       tinyCustomer.email = buyer.main_email
     }
     if (shippingAddress) {
-      if (storeId == 4566) {
+      if (storeId === 4566) {
         parseAddress(shippingAddress || billingAddress, tinyCustomer, appData)
       } else {
         parseAddress(billingAddress || shippingAddress, tinyCustomer, appData)
       }
-      
     }
     const phone = buyer.phones && buyer.phones[0]
     if (phone) {
@@ -134,7 +133,7 @@ module.exports = (order, appData, storeId) => {
   }
   if (storeId === 51324 && (order.payment_method_label.toLowerCase() === 'pix')) {
     tinyOrder.forma_pagamento = 'pix'
-  } 
+  }
   if (order.shipping_method_label) {
     tinyOrder.forma_frete = order.shipping_method_label
   }

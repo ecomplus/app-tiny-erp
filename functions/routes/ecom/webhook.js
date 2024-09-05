@@ -1,4 +1,5 @@
 /* eslint-disable no-loop-func, promise/no-nesting */
+const { logger } = require('../../context')
 const { baseUri, operatorToken } = require('./../../__env')
 // read configured E-Com Plus app data
 const getAppData = require('./../../lib/store-api/get-app-data')
@@ -22,7 +23,7 @@ const ECHO_API_ERROR = 'STORE_API_ERR'
 const handlingIds = []
 
 const removeFromQueue = (resourceId) => {
-  console.log(handlingIds)
+  logger.info(handlingIds)
   const handlingIndex = handlingIds.indexOf(resourceId)
   handlingIds.splice(handlingIndex, 1)
 }
@@ -31,7 +32,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
   // receiving notification from Store API
   const { storeId } = req
   if (req.get('host') && !baseUri.includes(req.get('host'))) {
-    console.log('>>> Proxy to function v2')
+    logger.info('>>> Proxy to function v2')
     const axios = require('axios')
     try {
       const { status, data } = await axios.post(req.url, req.body, {
@@ -41,7 +42,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
           'x-operator-token': operatorToken
         }
       })
-      console.log(`>>> Webhook proxy response: ${status} ${data}`)
+      logger.info(`>>> Webhook proxy response: ${status} ${data}`)
       return res.status(status).send(data)
     } catch (error) {
       const err = new Error('Error proxying to function v2')
@@ -50,7 +51,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
         status: error.response.status,
         data: error.response.data
       }
-      console.error(err)
+      logger.error(err)
     }
   }
 
@@ -60,7 +61,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
    */
   const trigger = req.body
   const resourceId = trigger.resource_id || trigger.inserted_id
-  console.log('>> ', resourceId, ' - Action: ', trigger.action)
+  logger.info(`>> ${resourceId} - Action: ${trigger.action}`)
   if (!handlingIds.includes(resourceId)) {
     handlingIds.push(resourceId)
     const key = `${trigger.resource}_${resourceId}`
@@ -81,7 +82,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
             }
 
             /* DO YOUR CUSTOM STUFF HERE */
-            console.log(`> Webhook #${storeId} ${resourceId} [${trigger.resource}]`)
+            logger.info(`> Webhook #${storeId} ${resourceId} [${trigger.resource}]`)
 
             const tinyToken = appData.tiny_api_token
             if (typeof tinyToken === 'string' && tinyToken) {
@@ -151,7 +152,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
                           const debugFlag = `#${storeId} ${action}/${queue}/${nextId}`
                           const delayMs = 6000
 
-                          console.log(`> Starting ${debugFlag}`)
+                          logger.info(`> Starting ${debugFlag}`)
                           const queueEntry = { action, queue, nextId, key, mustUpdateAppQueue }
 
                           return new Promise((resolve, reject) => {
@@ -207,9 +208,9 @@ exports.post = async ({ appSdk, admin }, req, res) => {
               status: err.response.status,
               data: err.response.data
             })
-            console.error(error)
+            logger.error(error)
           } else {
-            console.error(err)
+            logger.error(err)
           }
           // request to Store API with error response
           // return error status code
@@ -222,7 +223,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
         }
       })
   } else {
-    console.log(`# Skipped in execution #${resourceId} [${trigger.resource} - ${trigger.action}]`)
+    logger.info(`# Skipped in execution #${resourceId} [${trigger.resource} - ${trigger.action}]`)
     res.status(203).send('Concurrent request with same ResourceId')
   }
 }

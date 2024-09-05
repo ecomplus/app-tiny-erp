@@ -2,7 +2,7 @@ const ecomUtils = require('@ecomplus/utils')
 
 module.exports = (ecomProduct, variation, originalTinyProduct, appData, storeId) => {
   const { variacao } = variation
-  const ecomVariation = ecomProduct.variations.find(({sku}) => sku === variacao.codigo)
+  const ecomVariation = ecomProduct.variations.find(({ sku }) => sku === variacao.codigo)
 
   const product = {
     ...ecomProduct,
@@ -35,7 +35,8 @@ module.exports = (ecomProduct, variation, originalTinyProduct, appData, storeId)
   }
   if (product.min_quantity) {
     tinyProduct.unidade_por_caixa = product.min_quantity < 1000
-      ? String(product.min_quantity) : '999'
+      ? String(product.min_quantity)
+      : '999'
   }
 
   if (product.short_description) {
@@ -74,9 +75,9 @@ module.exports = (ecomProduct, variation, originalTinyProduct, appData, storeId)
   if (product.dimensions) {
     for (const side in product.dimensions) {
       if (product.dimensions[side] && product.dimensions[side].value) {
-        let field = side === 'width' ? 'largura'
-          : side === 'height' ? 'altura'
-            : 'comprimento'
+        let field = side === 'width'
+          ? 'largura'
+          : side === 'height' ? 'altura' : 'comprimento'
         field += '_embalagem'
         tinyProduct[field] = product.dimensions[side].value
         switch (product.dimensions[side].unit) {

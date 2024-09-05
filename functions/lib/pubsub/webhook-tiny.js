@@ -5,6 +5,7 @@ const getAppData = require('../store-api/get-app-data')
 // const updateAppData = require('../store-api/update-app-data')
 const importProduct = require('../integration/import-product')
 const importOrder = require('../integration/import-order')
+const { logger } = require('../../context')
 
 const getAppSdk = () => {
   return new Promise(resolve => {
@@ -23,7 +24,7 @@ module.exports = async (
   context
 ) => {
   if (flag === 'webhook') {
-    console.log('>> Exec Event ', context.eventId)
+    logger.info(`>> Exec Event ${context.eventId}`)
     const appSdk = await getAppSdk(admin)
 
     return appSdk.getAuth(storeId).then(auth => {
@@ -31,7 +32,7 @@ module.exports = async (
       return getAppData(appClient)
         .then(appData => {
           if (appData.tiny_api_token !== tinyToken) {
-            console.error('> Tiny Api Token not found or invalid')
+            logger.error('> Tiny Api Token not found or invalid')
             return
           }
 
@@ -46,7 +47,7 @@ module.exports = async (
 
             if (!orderNumbers.includes(orderNumber)) {
               return new Promise((resolve, reject) => {
-                console.log(`> Tiny webhook: #${storeId} order ${orderNumber}`)
+                logger.info(`> Tiny webhook: #${storeId} order ${orderNumber}`)
 
                 const queueEntry = {
                   nextId: orderNumber,
@@ -78,7 +79,7 @@ module.exports = async (
                   },
                   updatedAt: admin.firestore.Timestamp.fromDate(new Date())
                 }
-                console.log(`> Tiny webhook: #${storeId} ${nextId} => ${tinyStockUpdate.produto.saldo} - ${tinyStockUpdate.produto.estoqueAtual}`)
+                logger.info(`> Tiny webhook: #${storeId} ${nextId} => ${tinyStockUpdate.produto.saldo} - ${tinyStockUpdate.produto.estoqueAtual}`)
 
                 const queueEntry = {
                   nextId,
@@ -98,12 +99,12 @@ module.exports = async (
           return null
         })
         .then(() => {
-          console.log('>> End Event ', context.eventId)
+          logger.info(`>> End Event ${context.eventId}`)
         })
     })
       .catch((err) => {
         if (err.appWithoutAuth) {
-          console.error(err)
+          logger.error(err)
         } else {
           throw err
         }

@@ -65,7 +65,7 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
     })
 }).then(picture => {
   if (product && product.pictures) {
-    if (index == 0 || index) {
+    if (index === 0 || index) {
       product.pictures[index] = picture
     } else {
       product.pictures.push(picture)
@@ -119,8 +119,8 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
     }
     if (!product.slug) {
       product.slug = removeAccents(name.toLowerCase())
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-_./]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-_./]/g, '')
       if (!/[a-z0-9]/.test(product.slug.charAt(0))) {
         product.slug = `p-${product.slug}`
       }
@@ -182,10 +182,10 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
           const specTexts = []
           const gridIdFormat = text => {
             return removeAccents(text.toLowerCase())
-            .replace(/\s+/g, '_')
-            .replace(/[^a-z0-9_]/g, '')
-            .substring(0, 30)
-            .padStart(2, 'i')
+              .replace(/\s+/g, '_')
+              .replace(/[^a-z0-9_]/g, '')
+              .substring(0, 30)
+              .padStart(2, 'i')
           }
           if (!Array.isArray(grade)) {
             for (const tipo in grade) {
@@ -202,17 +202,17 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
               }
             }
           } else if (Array.isArray(grade)) {
-              grade.forEach(gd => {
-                const gridId = gridIdFormat(gd.chave)
-                const spec = {
-                  text: gd.valor
-                }
-                specTexts.push(spec.text)
-                if (gridId !== 'colors') {
-                  spec.value = removeAccents(spec.text.toLowerCase()).substring(0, 100)
-                }
-                specifications[gridId] = [spec]
-              })
+            grade.forEach(gd => {
+              const gridId = gridIdFormat(gd.chave)
+              const spec = {
+                text: gd.valor
+              }
+              specTexts.push(spec.text)
+              if (gridId !== 'colors') {
+                spec.value = removeAccents(spec.text.toLowerCase()).substring(0, 100)
+              }
+              specifications[gridId] = [spec]
+            })
           }
           let pictureId = 0
           if (Array.isArray(anexos) && anexos.length && Array.isArray(tinyProduct.anexos) && tinyProduct.anexos.length) {
@@ -245,7 +245,7 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
         if (imagemExterna.imagem_externa) {
           const { url } = imagemExterna.imagem_externa
           if (url) {
-            product.pictures.push({ 
+            product.pictures.push({
               normal: { url },
               _id: ecomUtils.randomObjectId()
             })
@@ -260,7 +260,7 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
       }
       const promises = []
       tinyProduct.anexos.forEach((anexo, i) => {
-        let url 
+        let url
         if (anexo && anexo.anexo) {
           url = anexo.anexo
         } else if (anexo.url) {

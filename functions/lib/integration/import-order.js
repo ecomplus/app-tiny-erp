@@ -3,6 +3,7 @@ const Tiny = require('../tiny/constructor')
 const parseOrder = require('./parsers/order-to-ecomplus/')
 const parseStatus = require('./parsers/order-to-ecomplus/status')
 const handleJob = require('./handle-job')
+const { logger } = require('../../context')
 
 const getLastStatus = records => {
   let statusRecord
@@ -25,14 +26,14 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           ? pedido.situacao.toLowerCase()
           : null
         const orderNumber = pedido.numero_ecommerce
-        console.log(`#${storeId} import order n${orderNumber} ${tinyOrderId} => ${situacao}`)
+        logger.info(`#${storeId} import order n${orderNumber} ${tinyOrderId} => ${situacao}`)
         const documentRef = firestore().doc(`tiny_orders/${storeId}_${tinyOrderId}`)
         return documentRef.get().then(documentSnapshot => {
           if (
             documentSnapshot.exists &&
             documentSnapshot.get('situacao') === situacao
           ) {
-            console.log(`>> Ignoring Tiny order n${orderNumber} ${tinyOrderId} with same status`)
+            logger.info(`>> Ignoring Tiny order n${orderNumber} ${tinyOrderId} with same status`)
             return null
           }
 
@@ -57,9 +58,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   promises.push(appSdk
                     .apiRequest(storeId, `/orders/${order._id}.json`, 'PATCH', partialOrder, auth))
                 }
-                const mapStatus = appData.tiny_map_status ||[]
-                if (4566 == storeId) {
-                  console.log('Mapeando status', JSON.stringify(mapStatus))
+                const mapStatus = appData.tiny_map_status || []
+                if (storeId === 4566) {
+                  logger.info(`Mapeando status ${JSON.stringify(mapStatus)})`)
                 }
                 const { fulfillmentStatus, financialStatus } = parseStatus(situacao, mapStatus, storeId)
                 const data = {
@@ -78,7 +79,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     data.status = newStatus
                     const endpoint = `/orders/${order._id}/${subresource}.json`
                     promises.push(appSdk.apiRequest(storeId, endpoint, 'POST', data, auth))
-                    console.log(`#${storeId} ${order._id} updated to ${newStatus} from Tiny ${tinyOrderId}`)
+                    logger.info(`#${storeId} ${order._id} updated to ${newStatus} from Tiny ${tinyOrderId}`)
                   }
                 })
 
@@ -94,7 +95,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   updatedAt: firestore.Timestamp.fromDate(new Date())
                 })
               } catch (err) {
-                console.error(err)
+                logger.error(err)
               }
               return (payload && payload.response) || payload
             })

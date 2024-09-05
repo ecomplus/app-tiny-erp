@@ -6,6 +6,7 @@ const Tiny = require('../tiny/constructor')
 const parseProduct = require('./parsers/product-to-ecomplus')
 const handleJob = require('./handle-job')
 const importCategoriesFromTiny = require('./import-category')
+const { logger } = require('../../context')
 
 module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, canCreateNew, isHiddenQueue) => {
   const [sku, productId] = String(queueEntry.nextId).split(';:')
@@ -28,7 +29,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
             lastUpdateTime = updateTime
             tinyStockUpdate = documentSnapshot.data()
           }
-          documentSnapshot.ref.delete().catch(console.error)
+          documentSnapshot.ref.delete().catch(logger.error)
         })
         resolve(tinyStockUpdate)
         /* if (
@@ -52,10 +53,10 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           .then(({ data }) => data)
           .catch(err => {
             if (err.response && err.response.status >= 400 && err.response.status < 500) {
-              console.log(`#${storeId} ${productId} => ${err.response.status}`)
+              logger.info(`#${storeId} ${productId} => ${err.response.status}`)
               return null
             }
-            console.error(err)
+            logger.error(err)
             throw err
           })
 
@@ -123,7 +124,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
         .then(payload => {
           const dispatchNullJob = () => handleJob({ appSdk, storeId }, queueEntry, Promise.resolve(null))
           if (!payload) {
-            console.log(`#${storeId} not found ${sku}`)
+            logger.info(`#${storeId} not found ${sku}`)
             dispatchNullJob()
             return payload
           }
@@ -134,8 +135,8 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
           const tiny = new Tiny(tinyToken)
 
           const handleTinyStock = ({ produto, tipo, preco, precoPromocional }, tinyProduct) => {
-            if (storeId == 51305) {
-              console.log('product importation', JSON.stringify(produto), tipo)
+            if (storeId === 51305) {
+              logger.info(`product importation ${JSON.stringify(produto)}, ${tipo}`)
             }
             let price, basePrice
             if (precoPromocional > 0) {
@@ -162,7 +163,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   endpoint += `/variations/${variationId}`
                 }
                 endpoint += '/quantity.json'
-                console.log(`#${storeId} ${endpoint}`, { quantity })
+                logger.info(`#${storeId} ${endpoint}`, { quantity })
                 return appSdk.apiRequest(storeId, endpoint, 'PUT', { quantity }, auth)
               } else if (!isNaN(price)) {
                 let endpoint = `/products/${product._id}`
@@ -170,7 +171,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   endpoint += `/variations/${variationId}`
                 }
                 endpoint += '/price.json'
-                console.log(`#${storeId} ${endpoint}`, { price })
+                logger.info(`#${storeId} ${endpoint}`, { price })
                 return appSdk.apiRequest(storeId, endpoint, 'PUT', { price, base_price: basePrice }, auth)
               }
               return null
@@ -182,13 +183,13 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
                     if (newProductId) {
                       await importCategoriesFromTiny({ appSdk, storeId, auth }, newProductId, arvoreCategoria)
-                        .catch(console.error)
+                        .catch(logger.error)
                     }
                   }
-                  console.log('Produto criado com sucesso')
+                  logger.info('Produto criado com sucesso')
                   return response
                 }).catch(err => {
-                  console.log(err)
+                  logger.info(err)
                 })
               })
             } else if (!tinyProduct || !produto) {
@@ -212,7 +213,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   if (!isNaN(quantity)) {
                     product.quantity = quantity >= 0 ? quantity : 0
                   }
-                  console.log(`#${storeId} ${method} ${endpoint} ${product.sku} ${product.price} ${product.quantity}`)
+                  logger.info(`#${storeId} ${method} ${endpoint} ${product.sku} ${product.price} ${product.quantity}`)
 
                   const promise = appSdk.apiRequest(storeId, endpoint, method, product, auth)
                     .then(async (response) => {
@@ -223,7 +224,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                         const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
                         if (productId) {
                           await importCategoriesFromTiny({ appSdk, storeId, auth }, productId, arvoreCategoria)
-                            .catch(console.error)
+                            .catch(logger.error)
                         }
                       }
                       return response
@@ -261,7 +262,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                             })
                             : true
                         })
-                    }).catch(console.error)
+                    }).catch(logger.error)
                   }
 
                   return promise
@@ -269,7 +270,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               })
           }
 
-          console.log(`#${storeId} ${JSON.stringify({ sku, productId, hasVariations, variationId, hasProduct })}`)
+          logger.info(`#${storeId} ${JSON.stringify({ sku, productId, hasVariations, variationId, hasProduct })}`)
           let job
           if (tinyStockUpdate && isHiddenQueue && (productId || hasProduct)) {
             job = handleTinyStock(tinyStockUpdate, tinyStockUpdate.produto)

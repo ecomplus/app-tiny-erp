@@ -4,6 +4,7 @@ const { getFirestore } = require('firebase-admin/firestore')
 const Tiny = require('./constructor')
 
 const parseVariation = require('../integration/parsers/product-to-tiny-variation')
+const { logger } = require('../../context')
 
 const getAppSdk = () => {
   return new Promise(resolve => {
@@ -34,64 +35,64 @@ module.exports = async () => {
       originalTinyProduct = info.originalTinyProduct
       const tiny = new Tiny(appData.tiny_api_token)
       documentRef = require('firebase-admin')
-      .firestore()
-      .doc(`${firestoreColl}/${product.sku}`)
+        .firestore()
+        .doc(`${firestoreColl}/${product.sku}`)
       return appSdk.getAuth(storeId)
-      .then(async (auth) => {
+        .then(async (auth) => {
           if (variations && variations.length) {
             const products = variations.slice(0, 8)
             for (let i = 0; i < products.length; i++) {
               try {
-                  console.log('Sending:', products.length, 'index:', i)
-                  const parsedVariation = parseVariation(product, products[i], originalTinyProduct, appData, storeId)
-                  await new Promise((resolve) => setTimeout(resolve, 1000))
-                  const bodyTiny = {
-                    produto: {
-                      produtos: [{
-                        produto: parsedVariation
-                      }]
-                    }
+                logger.info('Sending:', products.length, 'index:', i)
+                const parsedVariation = parseVariation(product, products[i], originalTinyProduct, appData, storeId)
+                await new Promise((resolve) => setTimeout(resolve, 1000))
+                const bodyTiny = {
+                  produto: {
+                    produtos: [{
+                      produto: parsedVariation
+                    }]
                   }
-                  console.log('Body variation', JSON.stringify(bodyTiny))
-                  tiny.post('/produto.alterar.php', bodyTiny).then(async response => {
-                    console.log(`Product ${products[i].codigo} sync successfully | #${storeId}`, response.data)
-                    variations.splice(i, 1)
-                    console.log('interaction:', i, 'variations:', JSON.stringify(variations))
-                    if (variations.length === 0) {
-                      await docs[0].ref.delete()
-                    } else {
-                      const body = {
-                        storeId,
-                        product,
-                        variations,
-                        appData,
-                        queuedAt: admin.firestore.Timestamp.now()
-                      }
-                      if (originalTinyProduct) {
-                        body.originalTinyProduct = originalTinyProduct
-                      }
-                      await documentRef.set(body)
-  
-                      console.log(`#${storeId} saving in firestore list of products after create or update`, products.length) 
+                }
+                logger.info('Body variation', JSON.stringify(bodyTiny))
+                tiny.post('/produto.alterar.php', bodyTiny).then(async response => {
+                  logger.info(`Product ${products[i].codigo} sync successfully | #${storeId} ${JSON.stringify(response.data)}`)
+                  variations.splice(i, 1)
+                  logger.info(`interaction: ${i} variations: ${JSON.stringify(variations)}`)
+                  if (variations.length === 0) {
+                    await docs[0].ref.delete()
+                  } else {
+                    const body = {
+                      storeId,
+                      product,
+                      variations,
+                      appData,
+                      queuedAt: admin.firestore.Timestamp.now()
                     }
-                  })
+                    if (originalTinyProduct) {
+                      body.originalTinyProduct = originalTinyProduct
+                    }
+                    await documentRef.set(body)
+
+                    logger.info(`#${storeId} saving in firestore list of products after create or update ${products.length}`)
+                  }
+                })
               } catch (err) {
-                  console.error(`Product ${products[i]._id} sync failed | #${storeId}`, err)
+                logger.warn(`Product ${products[i]._id} sync failed | #${storeId}`)
+                logger.error(err)
               }
             }
           }
-      })
-      .catch((err) => {
-        if (err.appWithoutAuth) {
-          console.error(err)
-        } else {
-          throw err
-        }
-      })
-      .then(() => {
-        console.log('>> End Event exportation')
-      })
+        })
+        .catch((err) => {
+          if (err.appWithoutAuth) {
+            logger.error(err)
+          } else {
+            throw err
+          }
+        })
+        .then(() => {
+          logger.info('>> End Event exportation')
+        })
     }
-    
   }
 }

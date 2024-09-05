@@ -1,4 +1,5 @@
 const functions = require('firebase-functions')
+const { logger } = require('../../context')
 const getPubSubTopic = (eventName) => {
   return `${eventName}_events`
 }
@@ -13,7 +14,7 @@ const createPubSubFunction = (
     .pubsub.topic(pubSubTopic).onPublish((message, context) => {
       const eventAgeMs = Date.now() - Date.parse(context.timestamp)
       if (eventAgeMs > eventMaxAgeMs) {
-        console.warn(`Dropping event ${context.eventId} with age[ms]: ${eventAgeMs}`)
+        logger.warn(`Dropping event ${context.eventId} with age[ms]: ${eventAgeMs}`)
         return
       }
       return fn(message.json, context, message)

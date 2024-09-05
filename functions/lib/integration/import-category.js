@@ -1,4 +1,5 @@
 const ecomUtils = require('@ecomplus/utils')
+const { logger } = require('../../context')
 
 const removeAccents = str => str.trim()
   .replace(/[áàãâÁÀÃÂ]/gi, 'a')
@@ -26,7 +27,7 @@ const getCategoriesAll = async ({ appSdk, storeId, auth }) => {
           return null
         }
       })
-      .catch(console.error)
+      .catch(logger.error)
 
     if (categories && categories.length) {
       hasRepeat = categories.length === limit
@@ -41,7 +42,7 @@ const getCategoriesAll = async ({ appSdk, storeId, auth }) => {
 }
 
 module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) => {
-  console.log(`# product: #${productId} tinyCategories: ${tinyCategories && JSON.stringify(tinyCategories)}`)
+  logger.info(`# product: #${productId} tinyCategories: ${tinyCategories && JSON.stringify(tinyCategories)}`)
   const allStoreCategories = await getCategoriesAll({ appSdk, storeId, auth })
   if (allStoreCategories.length && tinyCategories) {
     const categories = []
@@ -86,7 +87,7 @@ module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) =>
             const { data: { _id } } = response
             return { _id, ...body }
           })
-          .catch(console.error)
+          .catch(logger.error)
         if (newCategory) {
           // next interation new category exists in store
           allStoreCategories.push(newCategory)
@@ -101,6 +102,6 @@ module.exports = async ({ appSdk, storeId, auth }, productId, tinyCategories) =>
     }
 
     await appSdk.apiRequest(storeId, `/products/${productId}.json`, 'PATCH', { categories }, auth)
-      .catch(console.error)
+      .catch(logger.error)
   }
 }
