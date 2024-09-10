@@ -154,6 +154,17 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               quantity -= Number(produto.saldoReservado)
             }
             if (product && (!appData.update_product || variationId || (tipo === 'precos'))) {
+              if (produto.anexos) {
+                logger.info('save images')
+                firestore().doc(`product_anexos/${storeId}_${product._id}`)
+                  .set({
+                    anexos: produto.anexos,
+                    storeId,
+                    productId: product._id,
+                    exportedAt: firestore.Timestamp.now()
+                  }, { merge: true })
+                  .catch(logger.error)
+              }
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
                   quantity = 0
