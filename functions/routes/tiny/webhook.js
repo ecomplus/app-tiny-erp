@@ -22,6 +22,7 @@ exports.post = ({ appSdk, admin }, req, res) => {
   const storeId = parseInt(req.query.store_id, 10)
 
   if (storeId > 100 && typeof tinyToken === 'string' && tinyToken && req.body) {
+    logger.info(`storeId: ${storeId} => ${JSON.stringify(req.body)}`)
     const { dados, tipo } = req.body
     if (dados) {
       /*
