@@ -65,5 +65,5 @@ exports.post = ({ appSdk, admin }, req, res) => {
     }
   }
 
-  res.sendStatus(403)
+  return res.sendStatus(403)
 }

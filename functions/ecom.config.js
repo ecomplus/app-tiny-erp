@@ -68,8 +68,8 @@ const app = {
       // 'DELETE',        // Delete brands
     ],
     categories: [
-      // 'GET',           // List/read categories with public and private fields
-      // 'POST',          // Create categories
+      'GET',           // List/read categories with public and private fields
+      'POST',          // Create categories
       // 'PATCH',         // Edit categories
       // 'PUT',           // Overwrite categories
       // 'DELETE',        // Delete categories
