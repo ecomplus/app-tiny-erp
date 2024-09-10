@@ -220,6 +220,18 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                       if (appData.enable_category_import && tinyStockUpdate?.produto?.arvoreCategoria) {
                         if (!productId) {
                           productId = response.response?.data?._id
+                        } else {
+                          if (produto.anexos) {
+                            logger.info('save images')
+                            await firestore().doc(`product_anexos/${storeId}_${productId}`)
+                              .set({
+                                anexos: produto.anexos,
+                                storeId,
+                                productId,
+                                exportedAt: firestore.Timestamp.now()
+                              }, { merge: true })
+                              .catch(logger.error)
+                          }
                         }
                         const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
                         if (productId) {
