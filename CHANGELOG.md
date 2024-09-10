@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.4.1](https://github.com/ecomplus/application-starter/compare/v3.4.0...v3.4.1) (2024-09-10)
+
+
+### Bug Fixes
+
+* **ecom-config:** add permission to manipulate categories ([52d77f9](https://github.com/ecomplus/application-starter/commit/52d77f9fc47d90e03f38b95d41531a457bded2e3))
+* **import-products:** add debug to import category ([a609484](https://github.com/ecomplus/application-starter/commit/a609484a6af08954dda719af59fba6b6e0fa31b6))
+* list stores from auths up to 48h ([0deebf0](https://github.com/ecomplus/application-starter/commit/0deebf04ff234bb80fe2f8a3a3685914b9ffc383))
+* properly checking keywords max items and length on product import ([389ffc4](https://github.com/ecomplus/application-starter/commit/389ffc4027652fadb8f6547520178f3584c2aeb5))
+
 ## [3.4.0](https://github.com/ecomplus/application-starter/compare/v3.3.0...v3.4.0) (2024-07-08)
 
 
