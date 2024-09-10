@@ -19,7 +19,10 @@
       "PATCH"
     ],
     "brands": [],
-    "categories": [],
+    "categories": [
+      "GET",
+      "POST"
+    ],
     "customers": [],
     "orders": [
       "GET",
