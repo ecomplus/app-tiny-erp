@@ -23,7 +23,8 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
           'X-Store-ID': storeId,
           'X-My-ID': auth.myId,
           'X-Access-Token': auth.accessToken
-        }
+        },
+        timeout: 35000
       })
 
         .then(({ data, status }) => {
