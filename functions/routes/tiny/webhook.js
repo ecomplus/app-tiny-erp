@@ -34,14 +34,14 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       const docId = tipo === 'situacao_pedido' ? `orders_${webhookId}` : `products_${webhookId}`
       const firestoreDocId = `webhook_tiny/${storeId}_${docId}`
       const webhook = { tinyToken, storeId, body: req.body, flag: 'webhook', firestoreDocId }
-      await admin.firestore.doc(firestoreDocId)
-        .set({
-          eventyBy: 'tiny',
-          ...webhook,
-          storeId,
-          createdAt: admin.firestore.Timestamp.now()
-        }, { merge: true })
-        .catch(logger.error)
+      // await admin.firestore.doc(firestoreDocId)
+      //   .set({
+      //     eventyBy: 'tiny',
+      //     ...webhook,
+      //     storeId,
+      //     createdAt: admin.firestore.Timestamp.now()
+      //   }, { merge: true })
+      //   .catch(logger.error)
 
       return sendMessageTopic('tiny', webhook)
         .then(statusCode => {

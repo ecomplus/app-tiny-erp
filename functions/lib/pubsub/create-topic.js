@@ -7,7 +7,7 @@ const getPubSubTopic = (eventName) => {
 const createPubSubFunction = (
   pubSubTopic,
   fn,
-  eventMaxAgeMs = 60000
+  eventMaxAgeMs = (2 * 60 * 1000)
 ) => {
   return functions
     .runWith({ failurePolicy: true })
@@ -24,7 +24,7 @@ const createPubSubFunction = (
 const createEventsFunction = (
   eventName,
   fn,
-  eventMaxAgeMs = 60000
+  eventMaxAgeMs = (2 * 60 * 1000)
 ) => {
   const topicName = getPubSubTopic(eventName)
   return createPubSubFunction(topicName, fn, eventMaxAgeMs)
