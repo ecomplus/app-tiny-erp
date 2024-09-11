@@ -20,6 +20,8 @@ module.exports = async (change, context) => {
     processingAt,
     isNew
   } = data
+  let attempts = data.attempts || 0
+
   if (storeId > 100) {
     logger.info(`Event: StoreId ${storeId} productId: ${productId} ${isNew}`)
     const now = Timestamp.now()
@@ -41,7 +43,18 @@ module.exports = async (change, context) => {
       return saveImagesProduct({ appSdk, storeId, auth }, product, anexos)
         .then(async () => doc.ref.delete())
         .then(() => logger.info(`>Finish[${docId}]`))
-        .catch(logger.error)
+        .catch(err => {
+          logger.error(err)
+          attempts += 1
+          return Promise((resolve, reject) => {
+            // eslint-disable-next-line promise/no-nesting
+            const updateDoc = () => doc.ref.set({ attempts }, { merge: true })
+              .then(() => resolve(true))
+              .catch(reject)
+
+            setTimeout(updateDoc(), 60 * 1000)
+          })
+        })
     }
   }
   return null

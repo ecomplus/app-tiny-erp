@@ -3,6 +3,7 @@ const axios = require('axios')
 const { logger } = require('../../../context')
 const admin = require('firebase-admin')
 const { setup } = require('@ecomplus/application-sdk')
+const FormData = require('form-data')
 
 const getAppSdk = () => {
   return new Promise(resolve => {
@@ -64,18 +65,14 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index, isRetry) =>
     })
 
     .catch(err => {
-      if (err.name !== 'Unexpected Storage API response' && !isRetry) {
-        setTimeout(tryImageUpload(storeId, auth, originImgUrl, product, index, true), 700)
-      } else {
-        logger.error(err)
-        resolve({
-          _id: ecomUtils.randomObjectId(),
-          normal: {
-            url: originImgUrl,
-            alt: product.name
-          }
-        })
-      }
+      logger.error(err)
+      resolve({
+        _id: ecomUtils.randomObjectId(),
+        normal: {
+          url: originImgUrl,
+          alt: product.name
+        }
+      })
     })
 })
 
