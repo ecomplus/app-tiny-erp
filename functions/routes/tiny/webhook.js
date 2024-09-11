@@ -34,7 +34,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       const docId = tipo === 'situacao_pedido' ? `orders_${webhookId}` : `products_${webhookId}`
       await admin.firestore.doc(`webhook_tiny/${storeId}_${docId}`)
         .set({
-          eventyBy: 'tiny'
+          eventyBy: 'tiny',
           ...webhook,
           storeId,
           createdAt: admin.firestore.Timestamp.now()
