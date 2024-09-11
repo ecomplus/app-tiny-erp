@@ -8,22 +8,6 @@ const handleJob = require('./handle-job')
 const importCategoriesFromTiny = require('./import-category')
 const { logger } = require('../../context')
 
-const addImagesQueue = (produtoTiny, storeId, productId, isNew = false) => {
-  if (produtoTiny.anexos) {
-    logger.info('save images')
-    return firestore().doc(`product_anexos/${storeId}_${productId}`)
-      .set({
-        anexos: produtoTiny.anexos,
-        storeId,
-        productId,
-        createdAt: firestore.Timestamp.now(),
-        isNew
-      }, { merge: true })
-      .catch(logger.error)
-  }
-  return null
-}
-
 module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, canCreateNew, isHiddenQueue) => {
   const [sku, productId] = String(queueEntry.nextId).split(';:')
   let hasProduct = false
@@ -170,7 +154,6 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               quantity -= Number(produto.saldoReservado)
             }
             if (product && (!appData.update_product || variationId || (tipo === 'precos'))) {
-              addImagesQueue(tinyProduct, storeId, product._id)
               if (!isNaN(quantity)) {
                 if (quantity < 0) {
                   quantity = 0
@@ -196,18 +179,15 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               return parseProduct(tinyProduct, storeId, auth, true, tipo).then(product => {
                 return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth).then(async (response) => {
                   const { response: { data: { _id: newProductId } } } = response
-                  const promises = [addImagesQueue(tinyProduct, storeId, newProductId, true)]
 
                   if (appData.enable_category_import && tinyStockUpdate?.produto?.arvoreCategoria) {
                     const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
                     if (newProductId) {
-                      promises.push(
-                        importCategoriesFromTiny({ appSdk, storeId, auth }, newProductId, arvoreCategoria)
-                          .catch(logger.error)
-                      )
+                      await importCategoriesFromTiny({ appSdk, storeId, auth }, newProductId, arvoreCategoria)
+                        .catch(logger.error)
                     }
                   }
-                  await Promise.all(promises)
+
                   logger.info('Produto criado com sucesso')
                   return response
                 }).catch(err => {
@@ -246,11 +226,8 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                         }
                         const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
                         if (productId) {
-                          await Promise.all([
-                            addImagesQueue(produto, storeId, productId, method === 'POST'),
-                            importCategoriesFromTiny({ appSdk, storeId, auth }, productId, arvoreCategoria)
-                              .catch(logger.error)
-                          ])
+                          await importCategoriesFromTiny({ appSdk, storeId, auth }, productId, arvoreCategoria)
+                            .catch(logger.error)
                         }
                       }
                       return response
@@ -288,7 +265,10 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                             })
                             : true
                         })
-                    }).catch(logger.error)
+                    }).catch((err) => {
+                      logger.error(err)
+                      throw err
+                    })
                   }
 
                   return promise

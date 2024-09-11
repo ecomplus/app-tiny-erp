@@ -186,8 +186,8 @@ const queueCreateProduct = 'every 15 mins'
 exports.onUpdateProduct = functions.pubsub.schedule(queueCreateProduct).onRun(updateProduct)
 console.log(`-- Sheduled active access from  '${queueCreateProduct}'`)
 
-const handleEvents = require('./lib/integration/handle-images/import-images')
-exports.importImages = functions.firestore
-  .document('product_anexos/{docId}')
-  .onWrite(createExecContext(handleEvents))
-console.log('-- Starting import images to products')
+// const handleEvents = require('./lib/integration/handle-images/import-images')
+// exports.importImages = functions.firestore
+//   .document('product_anexos/{docId}')
+//   .onWrite(createExecContext(handleEvents))
+// console.log('-- Starting import images to products')
