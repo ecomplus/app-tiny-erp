@@ -29,20 +29,7 @@ exports.post = async ({ appSdk, admin }, req, res) => {
       TODO: check Tiny server IPs
       const clientIp = req.get('x-forwarded-for') || req.connection.remoteAddress
       */
-
-      // const webhookId = tipo === 'situacao_pedido' ? dados.idVendaTiny : (dados.codigo || dados.sku)
-      // const docId = tipo === 'situacao_pedido' ? `orders_${webhookId}` : `products_${webhookId}`
-      // const firestoreDocId = `webhook_tiny/${storeId}_${docId}`
       const webhook = { tinyToken, storeId, body: req.body, flag: 'webhook' }
-      // await admin.firestore().doc(firestoreDocId)
-      //   .set({
-      //     eventyBy: 'tiny',
-      //     ...webhook,
-      //     storeId,
-      //     createdAt: admin.firestore.Timestamp.now()
-      //   }, { merge: true })
-      //   .catch(logger.error)
-
       return sendMessageTopic('tiny', webhook)
         .then(statusCode => {
           if (tipo === 'produto' || (tipo === 'precos')) {
