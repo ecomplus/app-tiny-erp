@@ -11,7 +11,15 @@ const getAppSdk = () => {
   })
 }
 
-const tryImageUpload = (storeId, auth, originImgUrl, product, isRetry) => new Promise(resolve => {
+const getProductById = (appSdk, storeId, auth, productId) => appSdk
+  .apiRequest(storeId, `/products/${productId}.json`, 'GET', null, auth)
+  .then(({ response }) => response.data)
+  .catch(logger.error)
+
+const updateProductById = (appSdk, storeId, auth, productId, body) => appSdk
+  .apiRequest(storeId, `/products/${productId}.json`, 'PATCH', body, auth)
+
+const tryImageUpload = (storeId, auth, originImgUrl, product, index, isRetry) => new Promise(resolve => {
   axios.get(originImgUrl, {
     responseType: 'arraybuffer'
   })
@@ -57,9 +65,9 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, isRetry) => new Pr
 
     .catch(err => {
       if (err.name !== 'Unexpected Storage API response' && !isRetry) {
-        setTimeout(tryImageUpload(storeId, auth, originImgUrl, product, true), 700)
+        setTimeout(tryImageUpload(storeId, auth, originImgUrl, product, index, true), 700)
       } else {
-        console.error(err)
+        logger.error(err)
         resolve({
           _id: ecomUtils.randomObjectId(),
           normal: {
@@ -71,22 +79,22 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, isRetry) => new Pr
     })
 })
 
-// .then(picture => {
-//   if (product && product.pictures) {
-//     if (index === 0 || index) {
-//       product.pictures[index] = picture
-//     } else {
-//       product.pictures.push(picture)
-//     }
-//   }
-//   return picture
-// })
+  .then(picture => {
+    if (product && product.pictures) {
+      if (index === 0 || index) {
+        product.pictures[index] = picture
+      } else {
+        product.pictures.push(picture)
+      }
+    }
+    return picture
+  })
 
 const saveImagesProduct = async ({ appSdk, storeId, auth }, product, anexos) => {
   if (!product.pictures) {
     product.pictures = []
   }
-  // const promises = []
+  const promisesImgs = []
   anexos.forEach((anexo, i) => {
     let url
     if (anexo && anexo.anexo) {
@@ -101,7 +109,10 @@ const saveImagesProduct = async ({ appSdk, storeId, auth }, product, anexos) => 
       if (product.pictures.length) {
         const pathImg = url.split('/')
         const nameImg = pathImg[pathImg.length - 1]
-        const oldPictureIndex = product.pictures.findIndex(({ normal }) => normal.url.includes(nameImg))
+        const oldPictureIndex = product.pictures.length
+          ? product.pictures.findIndex(({ normal }) => normal.url.includes(nameImg))
+          : -1
+
         if (oldPictureIndex > -1) {
           index = oldPictureIndex
           const oldPicture = product.pictures[oldPictureIndex]
@@ -109,31 +120,36 @@ const saveImagesProduct = async ({ appSdk, storeId, auth }, product, anexos) => 
         }
       }
 
-      logger.info(`${product._id} ${JSON.stringify(product.picture)} exists: ${isImgExists} index: ${index} (${i}) ${url}`)
-      // const pictureExis
-      // if (!isImgExists) {
-      // }
-      // promises.push(tryImageUpload(storeId, auth, url, product, i))
+      logger.info(`${product._id} ${JSON.stringify(product.pictures)} exists: ${isImgExists} index: ${index} (${i}) ${url}`)
+      if (!isImgExists) {
+        promisesImgs.push(tryImageUpload(storeId, auth, url, product, i))
+      }
     }
   })
-  // return Promise.all(promises).then((images) => {
-  //   if (Array.isArray(product.variations) && product.variations.length) {
-  //     product.variations.forEach(variation => {
-  //       if (variation.picture_id || variation.picture_id === 0) {
-  //         const variationImage = images[variation.picture_id]
-  //         if (variationImage._id) {
-  //           variation.picture_id = variationImage._id
-  //         } else {
-  //           delete variation.picture_id
-  //         }
-  //       }
-  //     })
-  //   }
-  //   return resolve(product)
-  // })
+  return Promise.all(promisesImgs).then((images) => {
+    const body = {
+      pictures: product.pictures
+    }
+    if (Array.isArray(product.variations) && product.variations.length) {
+      product.variations.forEach(variation => {
+        if (variation.picture_id || variation.picture_id === 0) {
+          const variationImage = images[variation.picture_id]
+          if (variationImage._id) {
+            variation.picture_id = variationImage._id
+          } else {
+            delete variation.picture_id
+          }
+        }
+      })
+      body.variations = product.variations
+    }
+    logger.info(`Update product ${product._id} => ${JSON.stringify(body)}`)
+    return updateProductById(appSdk, storeId, auth, product._id, body)
+  })
 }
 
 module.exports = {
   saveImagesProduct,
-  getAppSdk
+  getAppSdk,
+  getProductById
 }
