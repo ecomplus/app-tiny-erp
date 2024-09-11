@@ -1,16 +1,15 @@
 const ecomUtils = require('@ecomplus/utils')
 const axios = require('axios')
 // const { logger } = require('../../../context')
-// const admin = require('firebase-admin')
+const admin = require('firebase-admin')
+const { setup } = require('@ecomplus/application-sdk')
 
-// const { setup } = require('@ecomplus/application-sdk')
-
-// const getAppSdk = () => {
-//   return new Promise(resolve => {
-//     setup(null, true, admin.firestore())
-//       .then(appSdk => resolve(appSdk))
-//   })
-// }
+const getAppSdk = () => {
+  return new Promise(resolve => {
+    setup(null, true, admin.firestore())
+      .then(appSdk => resolve(appSdk))
+  })
+}
 
 const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Promise(resolve => {
   axios.get(originImgUrl, {
@@ -79,5 +78,5 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
 
 module.exports = {
   tryImageUpload,
-  Timestamp
+  getAppSdk
 }
