@@ -1,6 +1,6 @@
 const ecomUtils = require('@ecomplus/utils')
 const axios = require('axios')
-// const { logger } = require('../../../context')
+const { logger } = require('../../../context')
 const admin = require('firebase-admin')
 const { setup } = require('@ecomplus/application-sdk')
 
@@ -11,7 +11,7 @@ const getAppSdk = () => {
   })
 }
 
-const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Promise(resolve => {
+const tryImageUpload = (storeId, auth, originImgUrl, product, isRetry) => new Promise(resolve => {
   axios.get(originImgUrl, {
     responseType: 'arraybuffer'
   })
@@ -56,27 +56,84 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
     })
 
     .catch(err => {
-      console.error(err)
-      resolve({
-        _id: ecomUtils.randomObjectId(),
-        normal: {
-          url: originImgUrl,
-          alt: product.name
-        }
-      })
+      if (err.name !== 'Unexpected Storage API response' && !isRetry) {
+        setTimeout(tryImageUpload(storeId, auth, originImgUrl, product, true), 700)
+      } else {
+        console.error(err)
+        resolve({
+          _id: ecomUtils.randomObjectId(),
+          normal: {
+            url: originImgUrl,
+            alt: product.name
+          }
+        })
+      }
     })
-}).then(picture => {
-  if (product && product.pictures) {
-    if (index === 0 || index) {
-      product.pictures[index] = picture
-    } else {
-      product.pictures.push(picture)
-    }
-  }
-  return picture
 })
 
+// .then(picture => {
+//   if (product && product.pictures) {
+//     if (index === 0 || index) {
+//       product.pictures[index] = picture
+//     } else {
+//       product.pictures.push(picture)
+//     }
+//   }
+//   return picture
+// })
+
+const saveImagesProduct = async ({ appSdk, storeId, auth }, product, anexos) => {
+  if (!product.pictures) {
+    product.pictures = []
+  }
+  // const promises = []
+  anexos.forEach((anexo, i) => {
+    let url
+    if (anexo && anexo.anexo) {
+      url = anexo.anexo
+    } else if (anexo.url) {
+      url = anexo.url
+    }
+
+    if (typeof url === 'string' && url.startsWith('http')) {
+      let isImgExists = false
+      let index = i
+      if (product.pictures.length) {
+        const pathImg = url.split('/')
+        const nameImg = pathImg[pathImg.length - 1]
+        const oldPictureIndex = product.pictures.findIndex(({ normal }) => normal.url.includes(nameImg))
+        if (oldPictureIndex > -1) {
+          index = oldPictureIndex
+          const oldPicture = product.pictures[oldPictureIndex]
+          isImgExists = oldPicture.normal.url !== url
+        }
+      }
+
+      logger.info(`${product._id} ${JSON.stringify(product.picture)} exists: ${isImgExists} index: ${index} (${i}) ${url}`)
+      // const pictureExis
+      // if (!isImgExists) {
+      // }
+      // promises.push(tryImageUpload(storeId, auth, url, product, i))
+    }
+  })
+  // return Promise.all(promises).then((images) => {
+  //   if (Array.isArray(product.variations) && product.variations.length) {
+  //     product.variations.forEach(variation => {
+  //       if (variation.picture_id || variation.picture_id === 0) {
+  //         const variationImage = images[variation.picture_id]
+  //         if (variationImage._id) {
+  //           variation.picture_id = variationImage._id
+  //         } else {
+  //           delete variation.picture_id
+  //         }
+  //       }
+  //     })
+  //   }
+  //   return resolve(product)
+  // })
+}
+
 module.exports = {
-  tryImageUpload,
+  saveImagesProduct,
   getAppSdk
 }

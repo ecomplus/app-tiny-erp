@@ -1,7 +1,7 @@
 // const getAppData = require('../store-api/get-app-data')
 const { logger } = require('../../../context')
 const { Timestamp } = require('firebase-admin/firestore')
-const { getAppSdk } = require('./utils')
+const { getAppSdk, saveImagesProduct } = require('./utils')
 
 const getProductById = (appSdk, storeId, auth, productId) => appSdk
   .apiRequest(storeId, `/products/${productId}.json`, 'GET', null, auth)
@@ -43,7 +43,8 @@ module.exports = async (change, context) => {
       ])
       // const appData = promises[0]
       const product = promises[0]
-      logger.info(`${JSON.stringify(product)} anexos: ${JSON.stringify(anexos)}`)
+      // logger.info(`${JSON.stringify(product)} anexos: ${JSON.stringify(anexos)}`)
+      saveImagesProduct({ appSdk, storeId, auth }, product, anexos)
     }
 
     // logger.info(`${storeId} ${productId} ${JSON.stringify(anexos)}`)
