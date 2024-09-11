@@ -253,40 +253,40 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
         }
       })
     }
-
-    if (tinyProduct.anexos) {
-      if (!product.pictures) {
-        product.pictures = []
-      }
-      const promises = []
-      tinyProduct.anexos.forEach((anexo, i) => {
-        let url
-        if (anexo && anexo.anexo) {
-          url = anexo.anexo
-        } else if (anexo.url) {
-          url = anexo.url
-        }
-        if (typeof url === 'string' && url.startsWith('http')) {
-          promises.push(tryImageUpload(storeId, auth, url, product, i))
-        }
-      })
-      return Promise.all(promises).then((images) => {
-        if (Array.isArray(product.variations) && product.variations.length) {
-          product.variations.forEach(variation => {
-            if (variation.picture_id || variation.picture_id === 0) {
-              const variationImage = images[variation.picture_id]
-              if (variationImage._id) {
-                variation.picture_id = variationImage._id
-              } else {
-                delete variation.picture_id
-              }
-            }
-          })
-        }
-        return resolve(product)
-      })
-    }
   }
+  //   if (tinyProduct.anexos) {
+  //     if (!product.pictures) {
+  //       product.pictures = []
+  //     }
+  //     const promises = []
+  //     tinyProduct.anexos.forEach((anexo, i) => {
+  //       let url
+  //       if (anexo && anexo.anexo) {
+  //         url = anexo.anexo
+  //       } else if (anexo.url) {
+  //         url = anexo.url
+  //       }
+  //       if (typeof url === 'string' && url.startsWith('http')) {
+  //         promises.push(tryImageUpload(storeId, auth, url, product, i))
+  //       }
+  //     })
+  //     return Promise.all(promises).then((images) => {
+  //       if (Array.isArray(product.variations) && product.variations.length) {
+  //         product.variations.forEach(variation => {
+  //           if (variation.picture_id || variation.picture_id === 0) {
+  //             const variationImage = images[variation.picture_id]
+  //             if (variationImage._id) {
+  //               variation.picture_id = variationImage._id
+  //             } else {
+  //               delete variation.picture_id
+  //             }
+  //           }
+  //         })
+  //       }
+  //       return resolve(product)
+  //     })
+  //   }
+  // }
 
   resolve(product)
 })
