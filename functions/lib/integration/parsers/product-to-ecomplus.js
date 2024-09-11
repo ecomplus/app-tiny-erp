@@ -12,7 +12,8 @@ const removeAccents = str => str.replace(/áàãâÁÀÃÂ/g, 'a')
 
 const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Promise((resolve, reject) => {
   axios.get(originImgUrl, {
-    responseType: 'arraybuffer'
+    responseType: 'arraybuffer',
+    timeout: 9000
   })
     .then(({ data }) => {
       const form = new FormData()
@@ -24,7 +25,7 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
           'X-My-ID': auth.myId,
           'X-Access-Token': auth.accessToken
         },
-        timeout: 35000
+        timeout: 15000
       })
         .then(({ data, status }) => {
           if (data.picture) {
