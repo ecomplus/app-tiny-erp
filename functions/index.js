@@ -123,6 +123,7 @@ recursiveReadDir(routesDir).filter(filepath => filepath.endsWith('.js')).forEach
     if (middleware) {
       router[method](filename, (req, res) => {
         console.log(`${method} ${filename}`)
+        // eslint-disable-next-line promise/always-return
         prepareAppSdk().then(appSdk => {
           middleware({ appSdk, admin }, req, res)
         }).catch(err => {
@@ -173,6 +174,7 @@ exports.onTinyEvents = require('./lib/pubsub/create-topic')
 const checkExportedOrders = require('./lib/integration/check-exported-orders')
 exports.checkExportedOrders = functions.runWith({ timeoutSeconds: 300 })
   .pubsub.schedule('44 * * * *').onRun(() => {
+    // eslint-disable-next-line promise/always-return
     return prepareAppSdk().then(appSdk => {
       checkExportedOrders({ appSdk })
     })
@@ -183,3 +185,9 @@ const updateProduct = require('./lib/tiny/export-variation')
 const queueCreateProduct = 'every 15 mins'
 exports.onUpdateProduct = functions.pubsub.schedule(queueCreateProduct).onRun(updateProduct)
 console.log(`-- Sheduled active access from  '${queueCreateProduct}'`)
+
+const handleEvents = require('./lib/integration/handle-images/import-images')
+exports.importImages = functions.firestore
+  .document('product_anexos/{docId}')
+  .onWrite(createExecContext(handleEvents))
+console.log('-- Starting import images to products')
