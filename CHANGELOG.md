@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.4.2](https://github.com/ecomplus/application-starter/compare/v3.4.0...v3.4.2) (2024-09-11)
+
+
+### Bug Fixes
+
+* **ecom-config:** add permission to manipulate categories ([52d77f9](https://github.com/ecomplus/application-starter/commit/52d77f9fc47d90e03f38b95d41531a457bded2e3))
+* fix handling sync image uploads on product import ([3d7ce21](https://github.com/ecomplus/application-starter/commit/3d7ce212876c543917085f865876979570fa9806))
+* **import-categories:** update debug ([2c3aaf0](https://github.com/ecomplus/application-starter/commit/2c3aaf09f9f0bf50e48299aad66d4bbadc0afc5b))
+* **import-image:** set timeout to import image ([c8fb988](https://github.com/ecomplus/application-starter/commit/c8fb98825fd459fe3fc40a1a2795e7d4dfc227e1))
+* **import-images:** fix import images ([8a08a5f](https://github.com/ecomplus/application-starter/commit/8a08a5f0b6dc203fcebf31fbd1a2d23218a13047))
+* **import-product:** disable images queue ([9600aa4](https://github.com/ecomplus/application-starter/commit/9600aa4eec2fc9e6f0c9bddcd99cce8cbfa421e0))
+* **import-product:** remove function images queue ([ce83dd7](https://github.com/ecomplus/application-starter/commit/ce83dd731774090f618504770a594de463bef8c3))
+* **import-products:** add debug to import category ([a609484](https://github.com/ecomplus/application-starter/commit/a609484a6af08954dda719af59fba6b6e0fa31b6))
+* **import-products:** remove import images ([ed81b97](https://github.com/ecomplus/application-starter/commit/ed81b97f3e62fa305dd5e3987b09ab0aa87c49b0))
+* list stores from auths up to 48h ([0deebf0](https://github.com/ecomplus/application-starter/commit/0deebf04ff234bb80fe2f8a3a3685914b9ffc383))
+* properly checking keywords max items and length on product import ([389ffc4](https://github.com/ecomplus/application-starter/commit/389ffc4027652fadb8f6547520178f3584c2aeb5))
+* **webhook-tiny:** back webhooks ([f5c9df5](https://github.com/ecomplus/application-starter/commit/f5c9df584a3d4c2e1f66fb9fc3ffa3095b1393bd))
+* **webhook-tiny:** remove unnecessary comments ([eb2bdf6](https://github.com/ecomplus/application-starter/commit/eb2bdf6298dafdaf6fe4aeb821799a6f861dfeb8))
+
 ### [3.4.1](https://github.com/ecomplus/application-starter/compare/v3.4.0...v3.4.1) (2024-09-10)
 
 
