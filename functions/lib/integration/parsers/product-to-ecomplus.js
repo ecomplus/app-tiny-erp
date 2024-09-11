@@ -1,6 +1,7 @@
 const ecomUtils = require('@ecomplus/utils')
 const axios = require('axios')
 const FormData = require('form-data')
+const { logger } = require('../../../context')
 
 const removeAccents = str => str.replace(/áàãâÁÀÃÂ/g, 'a')
   .replace(/éêÉÊ/g, 'e')
@@ -16,7 +17,6 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
     .then(({ data }) => {
       const form = new FormData()
       form.append('file', Buffer.from(data), originImgUrl.replace(/.*\/([^/]+)$/, '$1'))
-
       return axios.post(`https://apx-storage.e-com.plus/${storeId}/api/v1/upload.json`, form, {
         headers: {
           ...form.getHeaders(),
@@ -26,7 +26,6 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
         },
         timeout: 35000
       })
-
         .then(({ data, status }) => {
           if (data.picture) {
             for (const imgSize in data.picture) {
@@ -52,18 +51,14 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
           err.response = { data, status }
           throw err
         })
+        .catch(reject)
     })
-
-    .catch(err => {
-      reject(err)
-      // console.error(err)
-      // resolve({
-      //   _id: ecomUtils.randomObjectId(),
-      //   normal: {
-      //     url: originImgUrl,
-      //     alt: product.name
-      //   }
-      // })
+    .catch((err) => {
+      logger.warn(`Failed downloading image for ${storeId} ${product.sku}`, {
+        product,
+        originImgUrl
+      })
+      logger.warn(err)
     })
 }).then(picture => {
   if (product && product.pictures) {
@@ -76,7 +71,7 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
   return picture
 })
 
-module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => new Promise(async (resolve, reject) => {
+module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData) => {
   const sku = tinyProduct.codigo || String(tinyProduct.id)
   const name = (tinyProduct.nome || sku).trim()
   const isProduct = tipo === 'produto'
@@ -255,12 +250,12 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
         }
       })
     }
+
     if (tinyProduct.anexos) {
       const images = []
       if (!product.pictures) {
         product.pictures = []
       }
-      // const promises = []
       let i = 0
       const { anexos } = tinyProduct
       while (i < anexos.length) {
@@ -275,10 +270,8 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
           const image = await tryImageUpload(storeId, auth, url, product, i)
           images.push(image)
         }
-
         i += 1
       }
-
       if (Array.isArray(product.variations) && product.variations.length) {
         product.variations.forEach(variation => {
           if (variation.picture_id || variation.picture_id === 0) {
@@ -293,6 +286,5 @@ module.exports = (tinyProduct, storeId, auth, isNew = true, tipo, appData) => ne
       }
     }
   }
-
-  resolve(product)
-})
+  return product
+}

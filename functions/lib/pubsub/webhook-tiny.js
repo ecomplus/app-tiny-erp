@@ -89,6 +89,9 @@ module.exports = async (
                     if (!err && isDone) {
                       return resolve(true)
                     }
+                    if (err?.isConfigError === true) {
+                      return resolve(true)
+                    }
                     throw err
                   }
                 }

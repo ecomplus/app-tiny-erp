@@ -301,7 +301,6 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     }
                   }
                 }
-
                 const msg = `SKU ${sku} não encontrado no Tiny`
                 const err = new Error(msg)
                 err.isConfigError = true
