@@ -122,14 +122,14 @@ const saveImagesProduct = async ({ appSdk, storeId, auth }, product, anexos) => 
 
       logger.info(`${product._id} ${JSON.stringify(product.pictures)} exists: ${isImgExists} index: ${index} (${i}) ${url}`)
       if (!isImgExists) {
-        promisesImgs.push(tryImageUpload(storeId, auth, url, product, i))
+        promisesImgs.push(tryImageUpload(storeId, auth, url, product, index))
       }
     }
   })
   return Promise.all(promisesImgs).then((images) => {
-    const body = {
-      pictures: product.pictures
-    }
+    if (!images.length) return
+
+    const body = { pictures: product.pictures }
     if (Array.isArray(product.variations) && product.variations.length) {
       product.variations.forEach(variation => {
         if (variation.picture_id || variation.picture_id === 0) {
