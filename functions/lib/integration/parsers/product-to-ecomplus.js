@@ -9,7 +9,7 @@ const removeAccents = str => str.replace(/áàãâÁÀÃÂ/g, 'a')
   .replace(/úÚ/g, 'u')
   .replace(/çÇ/g, 'c')
 
-const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Promise(resolve => {
+const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Promise((resolve, reject) => {
   axios.get(originImgUrl, {
     responseType: 'arraybuffer'
   })
@@ -54,14 +54,15 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
     })
 
     .catch(err => {
-      console.error(err)
-      resolve({
-        _id: ecomUtils.randomObjectId(),
-        normal: {
-          url: originImgUrl,
-          alt: product.name
-        }
-      })
+      reject(err)
+      // console.error(err)
+      // resolve({
+      //   _id: ecomUtils.randomObjectId(),
+      //   normal: {
+      //     url: originImgUrl,
+      //     alt: product.name
+      //   }
+      // })
     })
 }).then(picture => {
   if (product && product.pictures) {

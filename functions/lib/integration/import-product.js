@@ -184,7 +184,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
                     if (newProductId) {
                       await importCategoriesFromTiny({ appSdk, storeId, auth }, newProductId, arvoreCategoria)
-                        .catch(logger.error)
+                        .catch(logger.warn)
                     }
                   }
 
@@ -192,7 +192,8 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                   return response
                 }).catch(err => {
                   err.storeId = storeId
-                  logger.info(err)
+                  logger.warn(err)
+                  throw err
                 })
               })
             } else if (!tinyProduct || !produto) {
@@ -227,7 +228,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                         const arvoreCategoria = tinyStockUpdate?.produto?.arvoreCategoria
                         if (productId) {
                           await importCategoriesFromTiny({ appSdk, storeId, auth }, productId, arvoreCategoria)
-                            .catch(logger.error)
+                            .catch(logger.warn)
                         }
                       }
                       return response
