@@ -17,7 +17,7 @@ exports.get = ({ appSdk, admin }, req, res) => {
   return res.sendStatus(200)
 }
 
-exports.post = ({ appSdk, admin }, req, res) => {
+exports.post = async ({ appSdk, admin }, req, res) => {
   const tinyToken = req.query.token
   const storeId = parseInt(req.query.store_id, 10)
 
@@ -29,8 +29,19 @@ exports.post = ({ appSdk, admin }, req, res) => {
       TODO: check Tiny server IPs
       const clientIp = req.get('x-forwarded-for') || req.connection.remoteAddress
       */
+      const webhook = { tinyToken, storeId, body: req.body, flag: 'webhook' }
+      const webhookId = tipo === 'situacao_pedido' ? dados.idVendaTiny : (dados.codigo || dados.sku)
+      const docId = tipo === 'situacao_pedido' ? `orders_${webhookId}` : `products_${webhookId}`
+      await admin.firestore.doc(`webhook_tiny/${storeId}_${docId}`)
+        .set({
+          eventyBy: 'tiny'
+          ...webhook,
+          storeId,
+          createdAt: admin.firestore.Timestamp.now()
+        }, { merge: true })
+        .catch(logger.error)
 
-      return sendMessageTopic('tiny', { tinyToken, storeId, body: req.body, flag: 'webhook' })
+      return sendMessageTopic('tiny', webhook)
         .then(statusCode => {
           if (tipo === 'produto' || (tipo === 'precos')) {
             const mapeamentos = []
