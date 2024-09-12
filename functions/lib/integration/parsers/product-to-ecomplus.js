@@ -76,24 +76,26 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
   const sku = tinyProduct.codigo || String(tinyProduct.id)
   const name = (tinyProduct.nome || sku).trim()
   const isProduct = tipo === 'produto'
-  const getCorrectPrice = (price) => {
-    return Number(price) > 0 ? Number(price) : null
+  const fixTinyPrice = (price) => {
+    return Number(price) > 0 ? Number(price) : 0
   }
-  const price = !isProduct ? Number(tinyProduct.preco_promocional || tinyProduct.preco) : Number(getCorrectPrice(tinyProduct.precoPromocional) || tinyProduct.preco)
+  const price = fixTinyPrice(tinyProduct.preco_promocional || tinyProduct.precoPromocional) ||
+    fixTinyPrice(tinyProduct.preco)
   const product = {
     available: tinyProduct.situacao === 'A',
     sku,
     name,
-    cost_price: !isProduct ? Number(tinyProduct.preco_custo) : Number(tinyProduct.precoCusto),
     price,
     base_price: Number(tinyProduct.preco),
     body_html: tinyProduct.descricao_complementar || tinyProduct.descricaoComplementar
   }
-
+  const costPrice = fixTinyPrice(tinyProduct.preco_custo || tinyProduct.precoCusto)
+  if (costPrice) {
+    product.cost_price = costPrice
+  }
   if (appData && appData.disable_price && !isNew && !isProduct) {
     delete product.price
   }
-
   if (tinyProduct.estoqueAtual) {
     product.quantity = tinyProduct.estoqueAtual
   }
