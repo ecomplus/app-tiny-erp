@@ -56,6 +56,20 @@ module.exports = async (
                     if (!err && isDone) {
                       return resolve(true)
                     }
+                    if (err?.config?.url) {
+                      const { method, url } = err.config
+                      logger.warn(`${method} ${url} failed`, {
+                        data: err.config.data,
+                        response: err.response?.data,
+                        status: err.response?.status
+                      })
+                      if (err.response?.status === 503) {
+                        setTimeout(() => {
+                          throw err
+                        }, 1000)
+                        return
+                      }
+                    }
                     throw err
                   }
                 }
@@ -99,6 +113,12 @@ module.exports = async (
                         response: err.response?.data,
                         status: err.response?.status
                       })
+                      if (err.response?.status === 503) {
+                        setTimeout(() => {
+                          throw err
+                        }, 1000)
+                        return
+                      }
                     }
                     throw err
                   }
