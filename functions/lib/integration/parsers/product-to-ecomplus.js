@@ -76,11 +76,11 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
   const sku = tinyProduct.codigo || String(tinyProduct.id)
   const name = (tinyProduct.nome || sku).trim()
   const isProduct = tipo === 'produto'
-  const fixTinyPrice = (price) => {
+  const fixToNumber = (price) => {
     return Number(price) > 0 ? Number(price) : 0
   }
-  const price = fixTinyPrice(tinyProduct.preco_promocional || tinyProduct.precoPromocional) ||
-    fixTinyPrice(tinyProduct.preco)
+  const price = fixToNumber(tinyProduct.preco_promocional || tinyProduct.precoPromocional) ||
+    fixToNumber(tinyProduct.preco)
   const product = {
     available: tinyProduct.situacao === 'A',
     sku,
@@ -89,7 +89,7 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
     base_price: Number(tinyProduct.preco),
     body_html: tinyProduct.descricao_complementar || tinyProduct.descricaoComplementar
   }
-  const costPrice = fixTinyPrice(tinyProduct.preco_custo || tinyProduct.precoCusto)
+  const costPrice = fixToNumber(tinyProduct.preco_custo || tinyProduct.precoCusto)
   if (costPrice) {
     product.cost_price = costPrice
   }
@@ -131,7 +131,10 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
     product.warranty = tinyProduct.garantia
   }
   if (tinyProduct.unidade_por_caixa || tinyProduct.unidadePorCaixa) {
-    product.min_quantity = !isProduct ? Number(tinyProduct.unidade_por_caixa) : Number(tinyProduct.unidadePorCaixa)
+    const minQuantity = fixToNumber(tinyProduct.unidade_por_caixa || tinyProduct.unidadePorCaixa)
+    if (minQuantity > 0) {
+      product.min_quantity = minQuantity
+    }
   }
   if (tinyProduct.ncm) {
     product.mpn = [tinyProduct.ncm]
