@@ -95,7 +95,8 @@ module.exports = async (
                     if (err?.config?.url) {
                       const { method, url } = err.config
                       logger.warn(`${method} ${url} failed`, {
-                        data: err.response?.data,
+                        data: err.config.data,
+                        response: err.response?.data,
                         status: err.response?.status
                       })
                     }
