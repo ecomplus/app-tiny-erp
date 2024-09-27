@@ -119,8 +119,8 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
     }
     if (!product.slug) {
       product.slug = removeAccents(name.toLowerCase())
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-_./]/g, '')
+        .replace(/[\s.]+/g, '-')
+        .replace(/[^a-z0-9-_/]/g, '')
       if (!/[a-z0-9]/.test(product.slug.charAt(0))) {
         product.slug = `p-${product.slug}`
       }
