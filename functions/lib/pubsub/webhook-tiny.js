@@ -63,6 +63,7 @@ module.exports = async (
                         response: err.response?.data,
                         status: err.response?.status
                       })
+                      if (err.response?.status === 403) return
                       if (err.response?.status === 503) {
                         setTimeout(() => {
                           throw err
@@ -113,6 +114,7 @@ module.exports = async (
                         response: err.response?.data,
                         status: err.response?.status
                       })
+                      if (err.response?.status === 403) return
                       if (err.response?.status === 503) {
                         setTimeout(() => {
                           throw err
