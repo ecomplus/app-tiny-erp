@@ -95,7 +95,7 @@ module.exports = (order, appData, storeId) => {
         tinyOrder.itens.push({
           item: {
             codigo: itemRef,
-            descricao: item.name ? item.name.substring(0, 120) : itemRef,
+            descricao: item.name ? item.name.substring(0, 120).replaceAll('&', 'e') : itemRef,
             unidade: 'UN',
             quantidade: item.quantity,
             valor_unitario: ecomUtils.price(item)
