@@ -149,7 +149,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               }
             })
           } else {
-            logger.info(`#${storeId} ${orderId} found with tiny status ${tinyStatus}`)
+            logger.info(`#${storeId} ${orderId} found with tiny status ${tinyStatus}`, {
+              originalTinyOrder
+            })
           }
 
           if (appData.update_financial_orders_only && orderUpdateType === 'fulfillment') {
