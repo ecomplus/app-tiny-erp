@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.1](https://github.com/ecomplus/application-starter/compare/v3.4.2...v4.0.1) (2025-02-14)
+
+
+### Bug Fixes
+
+* add timeout to external image download, reduce timeout to upload on storage api ([4660a79](https://github.com/ecomplus/application-starter/commit/4660a79ee6278df9344784dd09bbd6b02ba674b0))
+* better debugging failed requests on tiny webhook throw ([4e24226](https://github.com/ecomplus/application-starter/commit/4e24226a89f212bbca8aaa54227a9c6c863a47ae))
+* better debugging failed requests on tiny webhook throw ([6614081](https://github.com/ecomplus/application-starter/commit/6614081d31458d6c670e5f692f99346037e505ee))
+* cleaning special chars from order notes on export ([33b401a](https://github.com/ecomplus/application-starter/commit/33b401a14367f48afc40e9bf69cbb990176c861f))
+* delay to throw and retry on tiny events ended with 503 (rate limit) ([70c5b95](https://github.com/ecomplus/application-starter/commit/70c5b9596e9f515c58ea92ad9fe8fc645347d725))
+* fix checking min quantity to number from tiny data on product import ([99582f1](https://github.com/ecomplus/application-starter/commit/99582f136946f9d77065afe37108ca4ee474bc74))
+* prevent infinite retries on queue with store api 403 error ([d67dd60](https://github.com/ecomplus/application-starter/commit/d67dd60a24e10b51af5623206f3433a02ffc2d13))
+* properly parsing prices from tiny on product import ([6f950e8](https://github.com/ecomplus/application-starter/commit/6f950e8141d082f50086cf53784aef91d99e18de))
+* replacing & in item names to avoid order erros ([#164](https://github.com/ecomplus/application-starter/issues/164)) ([7558a98](https://github.com/ecomplus/application-starter/commit/7558a98407d9a130f9dd5df1c2bfdbeefc2afb91))
+
 ### [3.4.2](https://github.com/ecomplus/application-starter/compare/v3.4.0...v3.4.2) (2024-09-11)
 
 
