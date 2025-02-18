@@ -225,7 +225,7 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
             }
           }
           if (specTexts.length) {
-            const variationPlus = {
+            const variation = {
               _id: ecomUtils.randomObjectId(),
               name: `${name} / ${specTexts.join(' / ')}`.substring(0, 100),
               sku: codigo,
@@ -234,9 +234,13 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
               picture_id: pictureId
             }
             if (price !== parseFloat(preco)) {
-              variacaoObj.price = parseFloat(preco)
+              variation.price = parseFloat(preco)
             }
-            product.variations.push(variationPlus)
+            const gtin = variacao.gtin || variacao.gtin_embalagem || variacao.gtinEmbalagem
+            if (validateGtin(gtin)) {
+              variacao.gtin = gtin
+            }
+            product.variations.push(variation)
           }
         }
       })
