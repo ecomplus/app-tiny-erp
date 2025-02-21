@@ -3,12 +3,12 @@ const axios = require('axios')
 const FormData = require('form-data')
 const { logger } = require('../../../context')
 
-const removeAccents = str => str.replace(/áàãâÁÀÃÂ/g, 'a')
-  .replace(/éêÉÊ/g, 'e')
-  .replace(/óõôÓÕÔ/g, 'o')
-  .replace(/íÍ/g, 'e')
-  .replace(/úÚ/g, 'u')
-  .replace(/çÇ/g, 'c')
+const replaceAccents = str => str.replace(/[áàãâÁÀÃÂ]/g, 'a')
+  .replace(/[éêÉÊ]/g, 'e')
+  .replace(/[óõôÓÕÔ]/g, 'o')
+  .replace(/[íÍ]/g, 'i')
+  .replace(/[úÚ]/g, 'u')
+  .replace(/[çÇ]/g, 'c')
 
 const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Promise((resolve, reject) => {
   axios.get(originImgUrl, {
@@ -118,7 +118,7 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
       }
     }
     if (!product.slug) {
-      product.slug = removeAccents(name.toLowerCase())
+      product.slug = replaceAccents(name.toLowerCase())
         .replace(/[\s.]+/g, '-')
         .replace(/[^a-z0-9-_/]/g, '')
       if (!/[a-z0-9]/.test(product.slug.charAt(0))) {
@@ -184,7 +184,7 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
           const specifications = {}
           const specTexts = []
           const gridIdFormat = text => {
-            return removeAccents(text.toLowerCase())
+            return replaceAccents(text.toLowerCase())
               .replace(/\s+/g, '_')
               .replace(/[^a-z0-9_]/g, '')
               .substring(0, 30)
@@ -199,7 +199,7 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
                 }
                 specTexts.push(spec.text)
                 if (gridId !== 'colors') {
-                  spec.value = removeAccents(spec.text.toLowerCase()).substring(0, 100)
+                  spec.value = replaceAccents(spec.text.toLowerCase()).substring(0, 100)
                 }
                 specifications[gridId] = [spec]
               }
@@ -212,7 +212,7 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
               }
               specTexts.push(spec.text)
               if (gridId !== 'colors') {
-                spec.value = removeAccents(spec.text.toLowerCase()).substring(0, 100)
+                spec.value = replaceAccents(spec.text.toLowerCase()).substring(0, 100)
               }
               specifications[gridId] = [spec]
             })
