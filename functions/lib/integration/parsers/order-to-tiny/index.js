@@ -135,7 +135,7 @@ module.exports = (order, appData, storeId) => {
     tinyOrder.forma_pagamento = 'pix'
   }
   if (order.shipping_method_label) {
-    tinyOrder.forma_frete = order.shipping_method_label
+    tinyOrder.forma_frete = order.shipping_method_label.replaceAll('&', 'e')
   }
   if (shippingLine) {
     tinyOrder.forma_envio = 'X'
