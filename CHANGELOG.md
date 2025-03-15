@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/ecomplus/application-starter/compare/v4.0.1...v4.1.0) (2025-03-15)
+
+
+### Features
+
+* additional admin settings option to skip NCM/MPN sync [[#165](https://github.com/ecomplus/application-starter/issues/165)] ([7d5631d](https://github.com/ecomplus/application-starter/commit/7d5631d4a71e6465a50c1372a711f1ef7a4d402d))
+
+
+### Bug Fixes
+
+* properly replacing name accents on product import ([4e72366](https://github.com/ecomplus/application-starter/commit/4e72366a07f02f9a64b79e0712eebbebf843ee4b))
+* properly setting variation price and test variation gtin on product import ([db6a696](https://github.com/ecomplus/application-starter/commit/db6a69665673d24ba4c49265cfeeb0d4098a94e4))
+* replacing unnacepted char & on `shipping_method_label` for order export ([c984739](https://github.com/ecomplus/application-starter/commit/c984739fd9a873fa20b433aaf5a9432b5c101eb5))
+
 ### [4.0.1](https://github.com/ecomplus/application-starter/compare/v3.4.2...v4.0.1) (2025-02-14)
 
 
