@@ -236,6 +236,15 @@ const app = {
       },
       hide: true
     },
+    disable_ncm: {
+      schema: {
+        type: 'boolean',
+        default: false,
+        title: 'Desabilitar sincronização de NCMs',
+        description: 'Desabilitar importação/exportação de NCM/MPN de produtos'
+      },
+      hide: true
+    },
     non_number: {
       schema: {
         type: 'boolean',
