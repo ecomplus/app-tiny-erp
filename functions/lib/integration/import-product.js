@@ -176,7 +176,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
               }
               return null
             } else if (!product && tinyProduct && tipo === 'produto') {
-              return parseProduct(tinyProduct, storeId, auth, true, tipo).then(product => {
+              return parseProduct(tinyProduct, storeId, auth, true, tipo, appData).then(product => {
                 return appSdk.apiRequest(storeId, '/products.json', 'POST', product, auth).then(async (response) => {
                   const { response: { data: { _id: newProductId } } } = response
 

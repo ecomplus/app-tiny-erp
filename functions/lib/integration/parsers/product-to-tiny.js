@@ -40,7 +40,7 @@ module.exports = (product, originalTinyProduct, appData, storeId) => {
     tinyProduct.garantia = product.warranty.substring(0, 20)
   }
 
-  if (product.mpn && product.mpn.length && !appData.disable_ncm) {
+  if (product.mpn && product.mpn.length && !appData?.disable_ncm) {
     tinyProduct.ncm = product.mpn[0]
   }
   if (product.gtin && product.gtin.length) {

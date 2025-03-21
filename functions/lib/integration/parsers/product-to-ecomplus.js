@@ -136,7 +136,7 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
       product.min_quantity = minQuantity
     }
   }
-  if (tinyProduct.ncm && !appData.disable_ncm) {
+  if (tinyProduct.ncm && !appData?.disable_ncm) {
     product.mpn = [tinyProduct.ncm]
   }
   const validateGtin = gtin => typeof gtin === 'string' && /^([0-9]{8}|[0-9]{12,14})$/.test(gtin)
