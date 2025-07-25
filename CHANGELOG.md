@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/ecomplus/application-starter/compare/v4.1.0...v4.2.0) (2025-07-25)
+
+
+### Features
+
+* new payment and shipping methods map options on admin settings ([517bf72](https://github.com/ecomplus/application-starter/commit/517bf72f4bbfa8a7b8733a890e6689ea5702e87c))
+
+
+### Bug Fixes
+
+* properly passing app data on product parse for imports ([2b760cf](https://github.com/ecomplus/application-starter/commit/2b760cfbb1d6675f99e1772cefb26b819adf352f))
+
 ## [4.1.0](https://github.com/ecomplus/application-starter/compare/v4.0.1...v4.1.0) (2025-03-15)
 
 
