@@ -368,12 +368,12 @@ const app = {
     },
     tiny_map_status: {
       schema: {
-        title: 'Mapeamento de Status',
+        title: 'Mapeamento de status',
         type: 'array',
         maxItems: 30,
         items: {
           title: 'Relacionar status',
-          description: 'Escolha a equivalência de um status tiny para um status ecomplus',
+          description: 'Escolha a equivalência de um status tiny para um status e-com.plus',
           type: 'object',
           properties: {
             ecom_status: {
@@ -397,7 +397,7 @@ const app = {
                 'Retorno e troca',
                 'Não alterar status'
               ],
-              title: 'Status E-Com Plus'
+              title: 'Status e-com.plus'
             },
             tiny_status: {
               type: 'string',
@@ -414,6 +414,52 @@ const app = {
                 'Cancelado'
               ],
               title: 'Status Tiny'
+            }
+          }
+        }
+      },
+      hide: false
+    },
+    payment_method_maps: {
+      schema: {
+        title: 'Mapear de formas de pagamento',
+        type: 'array',
+        maxItems: 30,
+        items: {
+          title: 'Rótulo da forma de pagamento De > Para',
+          type: 'object',
+          properties: {
+            from: {
+              type: 'string',
+              title: 'Rótulo original no pedido'
+            },
+            to: {
+              type: 'string',
+              title: 'Substituir pelo rótulo',
+              description: 'Valor final enviado como "Meio de pagamento" para o Tiny'
+            }
+          }
+        }
+      },
+      hide: false
+    },
+    shipping_method_maps: {
+      schema: {
+        title: 'Mapear de formas de envio',
+        type: 'array',
+        maxItems: 30,
+        items: {
+          title: 'Rótulo da forma de envio De > Para',
+          type: 'object',
+          properties: {
+            from: {
+              type: 'string',
+              title: 'Rótulo original no pedido'
+            },
+            to: {
+              type: 'string',
+              title: 'Substituir pelo rótulo',
+              description: 'Valor final enviado como "Forma de frete" para o Tiny'
             }
           }
         }

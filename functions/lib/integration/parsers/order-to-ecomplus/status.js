@@ -15,7 +15,6 @@ module.exports = (situacao, mapStatus, storeId) => {
         return 'refunded'
       case 'Cancelado':
         return 'voided'
-        break;   
     }
   }
   const parseShippingStatus = (status) => {
@@ -38,7 +37,6 @@ module.exports = (situacao, mapStatus, storeId) => {
         return 'received_for_exchange'
       case 'Retorno e troca':
         return 'returned_for_exchange'
-        break;   
     }
   }
   let financialStatus, fulfillmentStatus
