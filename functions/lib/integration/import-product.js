@@ -205,6 +205,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 let method, endpoint
                 let productId = product && product._id
                 if (productId) {
+                  if (hasVariations && !variationId && product && product.sku !== sku) {
+                    return null
+                  }
                   method = 'PATCH'
                   endpoint = `/products/${productId}.json`
                 } else if (tipo === 'produto') {
