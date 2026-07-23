@@ -205,11 +205,39 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                 let method, endpoint
                 let productId = product && product._id
                 if (productId) {
-                  if (hasVariations && !variationId && product && product.sku !== sku) {
-                    return null
-                  }
                   method = 'PATCH'
                   endpoint = `/products/${productId}.json`
+                  if (!variationId && product && product.sku !== produto.codigo) {
+                    let variacaoData = null
+                    if (Array.isArray(produto.variacoes)) {
+                      const found = produto.variacoes.find(v =>
+                        String((v.variacao || v).codigo) === String(produto.codigo)
+                      )
+                      if (found) variacaoData = found.variacao || found
+                    }
+                    if (!variacaoData && produto.grade) {
+                      variacaoData = {
+                        codigo: produto.codigo,
+                        preco: produto.preco,
+                        grade: produto.grade,
+                        estoqueAtual: !isNaN(quantity) ? quantity : (produto.estoqueAtual || 0)
+                      }
+                    }
+                    if (!variacaoData) return null
+                    const variacaoEntry = tipo === 'produto' ? variacaoData : { variacao: variacaoData }
+                    return parseProduct(
+                      { ...produto, nome: (product.name || produto.nome), variacoes: [variacaoEntry] },
+                      storeId, auth, true, tipo, appData
+                    ).then(parsed => {
+                      const newVariation = parsed.variations && parsed.variations[0]
+                      if (!newVariation) return null
+                      if (!isNaN(quantity)) {
+                        newVariation.quantity = quantity >= 0 ? quantity : 0
+                      }
+                      logger.info(`#${storeId} POST /products/${productId}/variations.json ${newVariation.sku}`)
+                      return appSdk.apiRequest(storeId, `/products/${productId}/variations.json`, 'POST', newVariation, auth)
+                    })
+                  }
                 } else if (tipo === 'produto') {
                   method = 'POST'
                   endpoint = '/products.json'
