@@ -6,7 +6,8 @@
   "main": "functions/index.js",
   "scripts": {
     "serve": "echo 'Firebase runs with legacy Node.js 8; Use `npm run deploy` instead.'",
-    "deploy": "NODE_ENV=production node ./scripts/firebase-deploy.js",
+    "write-env": "NODE_ENV=production node ./scripts/firebase-deploy.js",
+    "deploy": "npm run write-env && npx --yes firebase-tools@13 deploy --only functions --non-interactive",
     "release": "standard-version",
     "release:starter": "standard-version --prerelease starter",
     "publish:market": "node ./scripts/market-publication.js"

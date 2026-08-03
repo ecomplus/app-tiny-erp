@@ -10,46 +10,110 @@ on:
       - 'scripts/firebase-deploy.js'
       - '*.json'
       - '.github/deploy'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Validar o deploy sem publicar (--dry-run)'
+        type: boolean
+        default: false
 
 jobs:
   deploy:
     name: Deploy to Firebase
     runs-on: ubuntu-latest
     if: |
-      github.event.head_commit.message != 'Initial commit' &&
-      !contains(github.event.head_commit.message, '[skip ci]')
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.head_commit.message != 'Initial commit' &&
+      !contains(github.event.head_commit.message, '[skip ci]'))
+
+    env:
+      # `secrets` nao pode ser usado direto em `if:`, entao vira env do job
+      HAS_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version: '22.x'
+          cache: 'npm'
 
       - name: Install root dependencies
-        run: npm i --only=production
+        run: npm i --omit=dev
 
       - name: Install functions dependencies
-        run: cd functions && npm i --only=production --no-optional && cd ..
+        run: npm i --omit=dev --no-optional --prefix functions
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run deploy
+      - name: Write functions/.env
+        env:
+          SERVER_OPERATOR_TOKEN: ${{ secrets.SERVER_OPERATOR_TOKEN }}
+        run: npm run write-env
+
+      - name: Authenticate with service account
+        if: env.HAS_SA == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud
+        if: env.HAS_SA == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Record deployed state (before)
+        id: before
+        if: env.HAS_SA == 'true'
+        run: |
+          set -euo pipefail
+          BEFORE=$(gcloud functions describe app --region us-central1 \
+            --project "$FIREBASE_PROJECT_ID" --format='value(updateTime)')
+          echo "updateTime=$BEFORE" >> "$GITHUB_OUTPUT"
+          echo "updateTime antes do deploy: $BEFORE"
+
+      - name: Deploy functions
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-          SERVER_OPERATOR_TOKEN: ${{ secrets.SERVER_OPERATOR_TOKEN }}
-        run: npm run deploy
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FIREBASE_PROJECT_ID:-}" ]; then
+            echo "::error::secret FIREBASE_PROJECT_ID nao configurado"
+            exit 1
+          fi
+          ARGS=(--only functions --project "$FIREBASE_PROJECT_ID" --non-interactive)
+          if [ "${DRY_RUN:-false}" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          if [ "${HAS_SA}" = "true" ]; then
+            echo "Autenticando via service account (ADC)"
+          elif [ -n "${FIREBASE_TOKEN:-}" ]; then
+            echo "::warning::Usando FIREBASE_TOKEN (firebase login:ci). O Google descontinuou esse fluxo - migrar para service account, ver issue #177"
+            ARGS+=(--token "$FIREBASE_TOKEN")
+          else
+            echo "::error::Nenhuma credencial disponivel. Configure o secret FIREBASE_SERVICE_ACCOUNT"
+            exit 1
+          fi
+          npx --yes firebase-tools@13 deploy "${ARGS[@]}"
+
+      - name: Verify functions were really published
+        if: env.HAS_SA == 'true' && inputs.dry_run != true
+        run: |
+          set -euo pipefail
+          AFTER=$(gcloud functions describe app --region us-central1 \
+            --project "$FIREBASE_PROJECT_ID" --format='value(updateTime)')
+          BEFORE='${{ steps.before.outputs.updateTime }}'
+          echo "updateTime antes:  $BEFORE"
+          echo "updateTime depois: $AFTER"
+          if [ "$AFTER" = "$BEFORE" ]; then
+            echo "::error::O deploy terminou sem erro, mas o updateTime nao avancou: nada foi publicado (ver issue #177)"
+            exit 1
+          fi
+          echo "Deploy confirmado: as functions foram republicadas."
 
   update-app-json:
     name: Update application and publish
@@ -58,7 +122,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Write README with base URI
         env:
@@ -80,7 +144,8 @@ jobs:
           git config --local user.email 'action@github.com'
           git config --local user.name 'GitHub Action'
           git add ./assets/
-          (git diff-index --quiet HEAD && echo "::set-output name=diff::0") || echo "::set-output name=diff::1"
+          (git diff-index --quiet HEAD && echo "diff=0" >> "$GITHUB_OUTPUT") \
+            || echo "diff=1" >> "$GITHUB_OUTPUT"
         id: git_diff
 
       - name: Commit local file changes
@@ -100,28 +165,20 @@ jobs:
           APP_CHANGED: ${{ steps.git_diff.outputs.diff }}
         run: |
           CAN_PUBLISH=$(node -p "!(/-/.test(require('./package.json').version)) && process.env.APP_CHANGED")
-          echo "::set-output name=publish::$CAN_PUBLISH"
+          echo "publish=$CAN_PUBLISH" >> "$GITHUB_OUTPUT"
         id: pkg_version
 
       - name: Setup Node
         if: steps.pkg_version.outputs.publish == 1
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '22.x'
           registry-url: 'https://registry.npmjs.org/'
-
-      - name: Cache dependencies
-        if: steps.pkg_version.outputs.publish == 1
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          cache: 'npm'
 
       - name: Install dependencies
         if: steps.pkg_version.outputs.publish == 1
-        run: npm ci --only=production
+        run: npm ci --omit=dev
 
       - name: Run publish script
         if: steps.pkg_version.outputs.publish == 1
