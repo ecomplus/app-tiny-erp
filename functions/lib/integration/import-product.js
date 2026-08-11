@@ -234,6 +234,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                       if (!isNaN(quantity)) {
                         newVariation.quantity = quantity >= 0 ? quantity : 0
                       }
+                      delete newVariation.picture_id
                       logger.info(`#${storeId} POST /products/${productId}/variations.json ${newVariation.sku}`)
                       return appSdk.apiRequest(storeId, `/products/${productId}/variations.json`, 'POST', newVariation, auth)
                     })
@@ -265,7 +266,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                       return response
                     })
 
-                  if (Array.isArray(produto.variacoes) && produto.variacoes.length) {
+                  const _tinyVars = Array.isArray(tinyProduct && tinyProduct.variacoes) ? tinyProduct.variacoes : []
+                  const _variacoesQueue = (Array.isArray(produto.variacoes) && produto.variacoes.length)
+                    ? produto.variacoes
+                    : _tinyVars.map(v => (v.variacao ? v : { variacao: v }))
+                  if (_variacoesQueue.length) {
                     promise.then(({ response }) => {
                       return getAppData({ appSdk, storeId, auth })
                         .then(appData => {
@@ -274,7 +279,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                             skus = []
                           }
                           let isQueuedVariations = false
-                          produto.variacoes.forEach(({ variacao }) => {
+                          _variacoesQueue.forEach(({ variacao }) => {
                             const { codigo } = variacao
                             let skuAndId = codigo
                             if (!productId) {

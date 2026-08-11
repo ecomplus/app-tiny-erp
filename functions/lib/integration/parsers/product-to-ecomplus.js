@@ -230,11 +230,14 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
               name: `${name} / ${specTexts.join(' / ')}`.substring(0, 100),
               sku: codigo,
               specifications,
-              quantity: estoqueAtual,
-              picture_id: pictureId
+              quantity: estoqueAtual
             }
-            if (price !== parseFloat(preco)) {
-              variation.price = parseFloat(preco)
+            if (Array.isArray(tinyProduct.anexos) && tinyProduct.anexos.length) {
+              variation.picture_id = pictureId
+            }
+            const varPrice = parseFloat(preco)
+            if (!isNaN(varPrice) && price !== varPrice) {
+              variation.price = varPrice
             }
             const gtin = variacao.gtin || variacao.gtin_embalagem || variacao.gtinEmbalagem
             if (validateGtin(gtin)) {
@@ -286,7 +289,7 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
         product.variations.forEach(variation => {
           if (variation.picture_id || variation.picture_id === 0) {
             const variationImage = images[variation.picture_id]
-            if (variationImage._id) {
+            if (variationImage && variationImage._id) {
               variation.picture_id = variationImage._id
             } else {
               delete variation.picture_id
