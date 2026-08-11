@@ -234,6 +234,7 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                       if (!isNaN(quantity)) {
                         newVariation.quantity = quantity >= 0 ? quantity : 0
                       }
+                      delete newVariation.picture_id
                       logger.info(`#${storeId} POST /products/${productId}/variations.json ${newVariation.sku}`)
                       return appSdk.apiRequest(storeId, `/products/${productId}/variations.json`, 'POST', newVariation, auth)
                     })
