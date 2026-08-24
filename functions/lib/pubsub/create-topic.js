@@ -10,7 +10,7 @@ const createPubSubFunction = (
   eventMaxAgeMs = (2 * 60 * 1000)
 ) => {
   return functions
-    .runWith({ failurePolicy: true, timeoutSeconds: 180 })
+    .runWith({ failurePolicy: true, timeoutSeconds: 300 })
     .pubsub.topic(pubSubTopic).onPublish((message, context) => {
       const eventAgeMs = Date.now() - Date.parse(context.timestamp)
       if (eventAgeMs > eventMaxAgeMs) {

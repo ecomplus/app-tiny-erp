@@ -60,9 +60,10 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
         originImgUrl
       })
       logger.warn(err)
+      resolve(undefined)
     })
 }).then(picture => {
-  if (product && product.pictures) {
+  if (picture && product && product.pictures) {
     if (index === 0 || index) {
       product.pictures[index] = picture
     } else {
@@ -71,6 +72,8 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
   }
   return picture
 })
+
+const IMAGE_UPLOAD_BATCH_SIZE = 10
 
 module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData) => {
   const sku = tinyProduct.codigo || String(tinyProduct.id)
@@ -269,22 +272,26 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
       if (!product.pictures) {
         product.pictures = []
       }
-      let i = 0
       const { anexos } = tinyProduct
-      while (i < anexos.length) {
-        const anexo = anexos[i]
-        let url
-        if (anexo && anexo.anexo) {
-          url = anexo.anexo
-        } else if (anexo.url) {
-          url = anexo.url
+      for (let start = 0; start < anexos.length; start += IMAGE_UPLOAD_BATCH_SIZE) {
+        const batch = []
+        for (let i = start; i < Math.min(start + IMAGE_UPLOAD_BATCH_SIZE, anexos.length); i++) {
+          const anexo = anexos[i]
+          let url
+          if (anexo && anexo.anexo) {
+            url = anexo.anexo
+          } else if (anexo.url) {
+            url = anexo.url
+          }
+          if (typeof url === 'string' && url.startsWith('http')) {
+            batch.push(tryImageUpload(storeId, auth, url, product, i).then(image => {
+              images[i] = image
+            }))
+          }
         }
-        if (typeof url === 'string' && url.startsWith('http')) {
-          const image = await tryImageUpload(storeId, auth, url, product, i)
-          images.push(image)
-        }
-        i += 1
+        await Promise.all(batch)
       }
+      product.pictures = product.pictures.filter(Boolean)
       if (Array.isArray(product.variations) && product.variations.length) {
         product.variations.forEach(variation => {
           if (variation.picture_id || variation.picture_id === 0) {
