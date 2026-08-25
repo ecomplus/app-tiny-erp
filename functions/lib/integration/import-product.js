@@ -234,11 +234,30 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                       if (!isNaN(quantity)) {
                         newVariation.quantity = quantity >= 0 ? quantity : 0
                       }
+                      const fullVariation = { ...newVariation }
                       delete newVariation.picture_id
                       delete newVariation._id
                       delete newVariation.name
                       logger.info(`#${storeId} POST /products/${productId}/variations.json ${newVariation.sku}`)
                       return appSdk.apiRequest(storeId, `/products/${productId}/variations.json`, 'POST', newVariation, auth)
+                        .then(async (createResponse) => {
+                          const newVariationId = createResponse?.response?.data?._id
+                          const picture = fullVariation.picture_id && Array.isArray(parsed.pictures) &&
+                            parsed.pictures.find(pic => pic && pic._id === fullVariation.picture_id)
+                          if (newVariationId && picture) {
+                            const pictures = [...(Array.isArray(product.pictures) ? product.pictures : []), picture]
+                            const variations = [
+                              ...(Array.isArray(product.variations) ? product.variations : []),
+                              { ...fullVariation, _id: newVariationId, picture_id: picture._id }
+                            ]
+                            await appSdk.apiRequest(storeId, `/products/${productId}.json`, 'PATCH', { pictures, variations }, auth)
+                              .catch(err => {
+                                logger.warn(`#${storeId} failed attaching picture to new variation ${fullVariation.sku}`)
+                                logger.warn(err)
+                              })
+                          }
+                          return createResponse
+                        })
                     })
                   }
                 } else if (tipo === 'produto') {
