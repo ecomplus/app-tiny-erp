@@ -245,11 +245,19 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                           const picture = fullVariation.picture_id && Array.isArray(parsed.pictures) &&
                             parsed.pictures.find(pic => pic && pic._id === fullVariation.picture_id)
                           if (newVariationId && picture) {
-                            const pictures = [...(Array.isArray(product.pictures) ? product.pictures : []), picture]
-                            const variations = [
-                              ...(Array.isArray(product.variations) ? product.variations : []),
-                              { ...fullVariation, _id: newVariationId, picture_id: picture._id }
-                            ]
+                            // re-fetch right before the PATCH (instead of reusing the `product` snapshot
+                            // from before the variation POST) to shrink the window for a concurrent
+                            // variation-add on the same product to clobber this one's pictures/variations
+                            const freshProduct = await ecomClient.store({
+                              storeId,
+                              url: `/products/${productId}.json`
+                            }).then(({ data }) => data).catch(() => product)
+                            const pictures = [...(Array.isArray(freshProduct.pictures) ? freshProduct.pictures : []), picture]
+                            const existingVariations = Array.isArray(freshProduct.variations) ? freshProduct.variations : []
+                            // the fresh fetch already includes the variation just created by the POST above
+                            const variations = existingVariations.some(v => v._id === newVariationId)
+                              ? existingVariations.map(v => v._id === newVariationId ? { ...v, picture_id: picture._id } : v)
+                              : [...existingVariations, { ...fullVariation, _id: newVariationId, picture_id: picture._id }]
                             await appSdk.apiRequest(storeId, `/products/${productId}.json`, 'PATCH', { pictures, variations }, auth)
                               .catch(err => {
                                 logger.warn(`#${storeId} failed attaching picture to new variation ${fullVariation.sku}`)
