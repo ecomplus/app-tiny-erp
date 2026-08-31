@@ -168,8 +168,10 @@ exports.scheduledClear = functions.runWith({ timeoutSeconds: 300 })
   .pubsub.schedule(clearStatesCron).onRun(clearTinyStates)
 console.log(`-- Sheduled clearing Tiny stored states '${clearStatesCron}'`)
 
+// eventMaxAgeMs must stay above timeoutSeconds, otherwise the failurePolicy
+// retry of a timed out execution is always dropped by the event age guard
 exports.onTinyEvents = require('./lib/pubsub/create-topic')
-  .createEventsFunction('tiny', createExecContext(handleEventTiny))
+  .createEventsFunction('tiny', createExecContext(handleEventTiny), 6 * 60 * 1000, 300)
 
 const checkExportedOrders = require('./lib/integration/check-exported-orders')
 exports.checkExportedOrders = functions.runWith({ timeoutSeconds: 300 })
