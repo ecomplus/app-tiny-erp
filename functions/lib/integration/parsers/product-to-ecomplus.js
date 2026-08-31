@@ -54,11 +54,14 @@ const tryImageUpload = (storeId, auth, originImgUrl, product) => {
       throw err
     })
     .catch(err => {
-      logger.warn(`Failed uploading image for #${storeId} ${product.sku}: ${err.message}`, {
+      const status = err.response && err.response.status
+      const data = err.response && err.response.data
+      logger.warn(`Failed importing image for #${storeId} ${product.sku}: ${status || err.message}`, {
         originImgUrl,
         sku: product.sku,
-        status: err.response && err.response.status,
-        response: err.response && err.response.data
+        status,
+        // a failed arraybuffer download yields a Buffer body — never serialize it
+        response: Buffer.isBuffer(data) ? `<buffer ${data.length} bytes>` : data
       })
       return undefined
     })
@@ -283,13 +286,11 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
         }
       }
       await Promise.all(uploadQueue.slice(0, IMAGE_UPLOAD_CONCURRENCY).map(runUploadWorker))
-      // keep `images` indexed by anexo position for `picture_id` resolution below,
-      // appending after any pictures already parsed from `imagens_externas`
-      images.forEach(image => {
-        if (image) {
-          product.pictures.push(image)
-        }
-      })
+      // `images` stays indexed by anexo position for `picture_id` resolution below;
+      // uploaded anexo pictures keep coming first in the gallery (legacy cover
+      // behavior) with `imagens_externas` entries preserved after them, instead
+      // of being overwritten by index collision
+      product.pictures = [...images.filter(Boolean), ...product.pictures]
       if (Array.isArray(product.variations) && product.variations.length) {
         product.variations.forEach(variation => {
           if (variation.picture_id || variation.picture_id === 0) {
