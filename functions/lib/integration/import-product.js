@@ -226,9 +226,15 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     if (!variacaoData) return null
                     const variacaoEntry = tipo === 'produto' ? variacaoData : { variacao: variacaoData }
                     return parseProduct(
-                      // parent `anexos` are blanked so only the variation's own images are
-                      // downloaded/uploaded — the parent pictures are already on the product
-                      { ...produto, nome: (product.name || produto.nome), anexos: [], variacoes: [variacaoEntry] },
+                      // parent `anexos`/`imagens_externas` are blanked so only the variation's
+                      // own images are uploaded — the parent pictures are already on the product
+                      {
+                        ...produto,
+                        nome: (product.name || produto.nome),
+                        anexos: [],
+                        imagens_externas: [],
+                        variacoes: [variacaoEntry]
+                      },
                       storeId, auth, true, tipo, appData
                     ).then(parsed => {
                       const newVariation = parsed.variations && parsed.variations[0]
@@ -252,21 +258,27 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                             ? parsed.pictures.find(pic => pic && pic._id === parsedPictureId)
                             : undefined
                           if (newVariationId && picture) {
-                            // append the uploaded image and link it through subresource endpoints
-                            // instead of PATCHing full `pictures`/`variations` arrays, so concurrent
-                            // writes on the same product cannot be clobbered by a read-modify-write
-                            const { _id, ...pictureBody } = picture
+                            // append the uploaded image(s) and link the variation through subresource
+                            // endpoints instead of PATCHing full `pictures`/`variations` arrays, so
+                            // concurrent writes on the same product cannot be clobbered
                             try {
-                              const { response } = await appSdk.apiRequest(
-                                storeId, `/products/${productId}/pictures.json`, 'POST', pictureBody, auth
-                              )
-                              const pictureId = response?.data?._id
-                              if (pictureId) {
+                              let variationPictureId
+                              for (const parsedPicture of parsed.pictures) {
+                                if (!parsedPicture) continue
+                                const { response } = await appSdk.apiRequest(
+                                  storeId, `/products/${productId}/pictures.json`, 'POST', parsedPicture, auth
+                                )
+                                const createdPictureId = response?.data?._id || parsedPicture._id
+                                if (parsedPicture._id === parsedPictureId) {
+                                  variationPictureId = createdPictureId
+                                }
+                              }
+                              if (variationPictureId) {
                                 await appSdk.apiRequest(
                                   storeId,
                                   `/products/${productId}/variations/${newVariationId}.json`,
                                   'PATCH',
-                                  { picture_id: pictureId },
+                                  { picture_id: variationPictureId },
                                   auth
                                 )
                               }
