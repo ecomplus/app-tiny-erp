@@ -226,7 +226,15 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     if (!variacaoData) return null
                     const variacaoEntry = tipo === 'produto' ? variacaoData : { variacao: variacaoData }
                     return parseProduct(
-                      { ...produto, nome: (product.name || produto.nome), variacoes: [variacaoEntry] },
+                      // parent `anexos`/`imagens_externas` are blanked so only the variation's
+                      // own images are uploaded — the parent pictures are already on the product
+                      {
+                        ...produto,
+                        nome: (product.name || produto.nome),
+                        anexos: [],
+                        imagens_externas: [],
+                        variacoes: [variacaoEntry]
+                      },
                       storeId, auth, true, tipo, appData
                     ).then(parsed => {
                       const newVariation = parsed.variations && parsed.variations[0]
@@ -234,11 +242,58 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                       if (!isNaN(quantity)) {
                         newVariation.quantity = quantity >= 0 ? quantity : 0
                       }
+                      const parsedPictureId = newVariation.picture_id
+                      // `picture_id` may also point to a re-upload of the parent's first image
+                      // (parser fallback when the variation has no `anexos` of its own) —
+                      // only attach when the picture really belongs to this variation
+                      const hasOwnPicture = Boolean(Array.isArray(variacaoData.anexos) && variacaoData.anexos.length)
                       delete newVariation.picture_id
                       delete newVariation._id
                       delete newVariation.name
                       logger.info(`#${storeId} POST /products/${productId}/variations.json ${newVariation.sku}`)
                       return appSdk.apiRequest(storeId, `/products/${productId}/variations.json`, 'POST', newVariation, auth)
+                        .then(async (createResponse) => {
+                          const newVariationId = createResponse?.response?.data?._id
+                          const picture = hasOwnPicture && parsedPictureId && Array.isArray(parsed.pictures)
+                            ? parsed.pictures.find(pic => pic && pic._id === parsedPictureId)
+                            : undefined
+                          if (newVariationId && picture) {
+                            // append the uploaded image(s) and link the variation through subresource
+                            // endpoints instead of PATCHing full `pictures`/`variations` arrays, so
+                            // concurrent writes on the same product cannot be clobbered
+                            try {
+                              let variationPictureId
+                              for (const parsedPicture of parsed.pictures) {
+                                if (!parsedPicture) continue
+                                const { response } = await appSdk.apiRequest(
+                                  storeId, `/products/${productId}/pictures.json`, 'POST', parsedPicture, auth
+                                )
+                                const createdPictureId = response?.data?._id || parsedPicture._id
+                                if (parsedPicture._id === parsedPictureId) {
+                                  variationPictureId = createdPictureId
+                                }
+                              }
+                              if (variationPictureId) {
+                                await appSdk.apiRequest(
+                                  storeId,
+                                  `/products/${productId}/variations/${newVariationId}.json`,
+                                  'PATCH',
+                                  { picture_id: variationPictureId },
+                                  auth
+                                )
+                              }
+                            } catch (err) {
+                              const status = err.response && err.response.status
+                              logger.warn(`#${storeId} failed attaching picture to new variation ` +
+                                `${newVariation.sku}: ${status || err.message}`, {
+                                productId,
+                                variationId: newVariationId,
+                                response: err.response && err.response.data
+                              })
+                            }
+                          }
+                          return createResponse
+                        })
                     })
                   }
                 } else if (tipo === 'produto') {

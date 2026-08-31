@@ -172,6 +172,7 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
   if (isNew) {
     if (Array.isArray(tinyProduct.variacoes) && tinyProduct.variacoes.length) {
       product.variations = []
+      const parentAnexosCount = Array.isArray(tinyProduct.anexos) ? tinyProduct.anexos.length : 0
       tinyProduct.variacoes.forEach(variacaoObj => {
         const variacao = !isProduct
           ? variacaoObj.variacao
@@ -215,7 +216,13 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
             })
           }
           let pictureId = 0
-          if (Array.isArray(anexos) && anexos.length && Array.isArray(tinyProduct.anexos) && tinyProduct.anexos.length) {
+          const hasOwnAnexos = Boolean(Array.isArray(anexos) && anexos.length)
+          if (hasOwnAnexos) {
+            // variation images must be queued for upload even when the parent
+            // product has no `anexos` of its own
+            if (!Array.isArray(tinyProduct.anexos)) {
+              tinyProduct.anexos = []
+            }
             pictureId = tinyProduct.anexos.length
             for (const anexo of anexos) {
               tinyProduct.anexos.push(anexo)
@@ -229,7 +236,9 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
               specifications,
               quantity: estoqueAtual
             }
-            if (Array.isArray(tinyProduct.anexos) && tinyProduct.anexos.length) {
+            // fall back to the parent's first image only when the parent really
+            // has anexos of its own — never to another variation's pushed image
+            if (hasOwnAnexos || parentAnexosCount) {
               variation.picture_id = pictureId
             }
             const varPrice = parseFloat(preco)
