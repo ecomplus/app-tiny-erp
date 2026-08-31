@@ -10,8 +10,8 @@ const replaceAccents = str => str.replace(/[áàãâÁÀÃÂ]/g, 'a')
   .replace(/[úÚ]/g, 'u')
   .replace(/[çÇ]/g, 'c')
 
-const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Promise((resolve, reject) => {
-  axios.get(originImgUrl, {
+const tryImageUpload = (storeId, auth, originImgUrl, product) => {
+  return axios.get(originImgUrl, {
     responseType: 'arraybuffer',
     timeout: 9000
   })
@@ -27,53 +27,44 @@ const tryImageUpload = (storeId, auth, originImgUrl, product, index) => new Prom
         },
         timeout: 15000
       })
-        .then(({ data, status }) => {
-          if (data.picture) {
-            for (const imgSize in data.picture) {
-              if (data.picture[imgSize]) {
-                if (!data.picture[imgSize].url) {
-                  delete data.picture[imgSize]
-                  continue
-                }
-                if (data.picture[imgSize].size !== undefined) {
-                  delete data.picture[imgSize].size
-                }
-                data.picture[imgSize].alt = `${product.name} (${imgSize})`
-              }
+    })
+    .then(({ data, status }) => {
+      if (data.picture) {
+        for (const imgSize in data.picture) {
+          if (data.picture[imgSize]) {
+            if (!data.picture[imgSize].url) {
+              delete data.picture[imgSize]
+              continue
             }
-            if (Object.keys(data.picture).length) {
-              return resolve({
-                _id: ecomUtils.randomObjectId(),
-                ...data.picture
-              })
+            if (data.picture[imgSize].size !== undefined) {
+              delete data.picture[imgSize].size
             }
+            data.picture[imgSize].alt = `${product.name} (${imgSize})`
           }
-          const err = new Error('Unexpected Storage API response')
-          err.response = { data, status }
-          throw err
-        })
-        .catch(reject)
+        }
+        if (Object.keys(data.picture).length) {
+          return {
+            _id: ecomUtils.randomObjectId(),
+            ...data.picture
+          }
+        }
+      }
+      const err = new Error('Unexpected Storage API response')
+      err.response = { data, status }
+      throw err
     })
-    .catch((err) => {
-      logger.warn(`Failed downloading image for ${storeId} ${product.sku}`, {
-        product,
-        originImgUrl
+    .catch(err => {
+      logger.warn(`Failed uploading image for #${storeId} ${product.sku}: ${err.message}`, {
+        originImgUrl,
+        sku: product.sku,
+        status: err.response && err.response.status,
+        response: err.response && err.response.data
       })
-      logger.warn(err)
-      resolve(undefined)
+      return undefined
     })
-}).then(picture => {
-  if (picture && product && product.pictures) {
-    if (index === 0 || index) {
-      product.pictures[index] = picture
-    } else {
-      product.pictures.push(picture)
-    }
-  }
-  return picture
-})
+}
 
-const IMAGE_UPLOAD_BATCH_SIZE = 10
+const IMAGE_UPLOAD_CONCURRENCY = 10
 
 module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData) => {
   const sku = tinyProduct.codigo || String(tinyProduct.id)
@@ -273,25 +264,32 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
         product.pictures = []
       }
       const { anexos } = tinyProduct
-      for (let start = 0; start < anexos.length; start += IMAGE_UPLOAD_BATCH_SIZE) {
-        const batch = []
-        for (let i = start; i < Math.min(start + IMAGE_UPLOAD_BATCH_SIZE, anexos.length); i++) {
-          const anexo = anexos[i]
-          let url
-          if (anexo && anexo.anexo) {
-            url = anexo.anexo
-          } else if (anexo.url) {
-            url = anexo.url
-          }
-          if (typeof url === 'string' && url.startsWith('http')) {
-            batch.push(tryImageUpload(storeId, auth, url, product, i).then(image => {
-              images[i] = image
-            }))
-          }
+      const uploadQueue = []
+      for (let i = 0; i < anexos.length; i++) {
+        const anexo = anexos[i]
+        const url = anexo && (anexo.anexo || anexo.url)
+        if (typeof url === 'string' && url.startsWith('http')) {
+          uploadQueue.push({ index: i, url })
         }
-        await Promise.all(batch)
       }
-      product.pictures = product.pictures.filter(Boolean)
+      // sliding window: each worker picks the next pending upload as soon as
+      // its current one settles, so one slow image never stalls the other slots
+      let cursor = 0
+      const runUploadWorker = async () => {
+        while (cursor < uploadQueue.length) {
+          const { index, url } = uploadQueue[cursor]
+          cursor += 1
+          images[index] = await tryImageUpload(storeId, auth, url, product)
+        }
+      }
+      await Promise.all(uploadQueue.slice(0, IMAGE_UPLOAD_CONCURRENCY).map(runUploadWorker))
+      // keep `images` indexed by anexo position for `picture_id` resolution below,
+      // appending after any pictures already parsed from `imagens_externas`
+      images.forEach(image => {
+        if (image) {
+          product.pictures.push(image)
+        }
+      })
       if (Array.isArray(product.variations) && product.variations.length) {
         product.variations.forEach(variation => {
           if (variation.picture_id || variation.picture_id === 0) {
