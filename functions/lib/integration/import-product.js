@@ -226,7 +226,9 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                     if (!variacaoData) return null
                     const variacaoEntry = tipo === 'produto' ? variacaoData : { variacao: variacaoData }
                     return parseProduct(
-                      { ...produto, nome: (product.name || produto.nome), variacoes: [variacaoEntry] },
+                      // parent `anexos` are blanked so only the variation's own images are
+                      // downloaded/uploaded — the parent pictures are already on the product
+                      { ...produto, nome: (product.name || produto.nome), anexos: [], variacoes: [variacaoEntry] },
                       storeId, auth, true, tipo, appData
                     ).then(parsed => {
                       const newVariation = parsed.variations && parsed.variations[0]
@@ -234,7 +236,11 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                       if (!isNaN(quantity)) {
                         newVariation.quantity = quantity >= 0 ? quantity : 0
                       }
-                      const fullVariation = { ...newVariation }
+                      const parsedPictureId = newVariation.picture_id
+                      // `picture_id` may also point to a re-upload of the parent's first image
+                      // (parser fallback when the variation has no `anexos` of its own) —
+                      // only attach when the picture really belongs to this variation
+                      const hasOwnPicture = Boolean(Array.isArray(variacaoData.anexos) && variacaoData.anexos.length)
                       delete newVariation.picture_id
                       delete newVariation._id
                       delete newVariation.name
@@ -242,27 +248,37 @@ module.exports = ({ appSdk, storeId, auth }, tinyToken, queueEntry, appData, can
                       return appSdk.apiRequest(storeId, `/products/${productId}/variations.json`, 'POST', newVariation, auth)
                         .then(async (createResponse) => {
                           const newVariationId = createResponse?.response?.data?._id
-                          const picture = fullVariation.picture_id && Array.isArray(parsed.pictures) &&
-                            parsed.pictures.find(pic => pic && pic._id === fullVariation.picture_id)
+                          const picture = hasOwnPicture && parsedPictureId && Array.isArray(parsed.pictures)
+                            ? parsed.pictures.find(pic => pic && pic._id === parsedPictureId)
+                            : undefined
                           if (newVariationId && picture) {
-                            // re-fetch right before the PATCH (instead of reusing the `product` snapshot
-                            // from before the variation POST) to shrink the window for a concurrent
-                            // variation-add on the same product to clobber this one's pictures/variations
-                            const freshProduct = await ecomClient.store({
-                              storeId,
-                              url: `/products/${productId}.json`
-                            }).then(({ data }) => data).catch(() => product)
-                            const pictures = [...(Array.isArray(freshProduct.pictures) ? freshProduct.pictures : []), picture]
-                            const existingVariations = Array.isArray(freshProduct.variations) ? freshProduct.variations : []
-                            // the fresh fetch already includes the variation just created by the POST above
-                            const variations = existingVariations.some(v => v._id === newVariationId)
-                              ? existingVariations.map(v => v._id === newVariationId ? { ...v, picture_id: picture._id } : v)
-                              : [...existingVariations, { ...fullVariation, _id: newVariationId, picture_id: picture._id }]
-                            await appSdk.apiRequest(storeId, `/products/${productId}.json`, 'PATCH', { pictures, variations }, auth)
-                              .catch(err => {
-                                logger.warn(`#${storeId} failed attaching picture to new variation ${fullVariation.sku}`)
-                                logger.warn(err)
+                            // append the uploaded image and link it through subresource endpoints
+                            // instead of PATCHing full `pictures`/`variations` arrays, so concurrent
+                            // writes on the same product cannot be clobbered by a read-modify-write
+                            const { _id, ...pictureBody } = picture
+                            try {
+                              const { response } = await appSdk.apiRequest(
+                                storeId, `/products/${productId}/pictures.json`, 'POST', pictureBody, auth
+                              )
+                              const pictureId = response?.data?._id
+                              if (pictureId) {
+                                await appSdk.apiRequest(
+                                  storeId,
+                                  `/products/${productId}/variations/${newVariationId}.json`,
+                                  'PATCH',
+                                  { picture_id: pictureId },
+                                  auth
+                                )
+                              }
+                            } catch (err) {
+                              const status = err.response && err.response.status
+                              logger.warn(`#${storeId} failed attaching picture to new variation ` +
+                                `${newVariation.sku}: ${status || err.message}`, {
+                                productId,
+                                variationId: newVariationId,
+                                response: err.response && err.response.data
                               })
+                            }
                           }
                           return createResponse
                         })

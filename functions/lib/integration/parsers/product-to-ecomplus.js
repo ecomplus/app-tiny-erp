@@ -218,7 +218,12 @@ module.exports = async (tinyProduct, storeId, auth, isNew = true, tipo, appData)
             })
           }
           let pictureId = 0
-          if (Array.isArray(anexos) && anexos.length && Array.isArray(tinyProduct.anexos) && tinyProduct.anexos.length) {
+          if (Array.isArray(anexos) && anexos.length) {
+            // variation images must be queued for upload even when the parent
+            // product has no `anexos` of its own
+            if (!Array.isArray(tinyProduct.anexos)) {
+              tinyProduct.anexos = []
+            }
             pictureId = tinyProduct.anexos.length
             for (const anexo of anexos) {
               tinyProduct.anexos.push(anexo)
